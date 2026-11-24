@@ -181,11 +181,11 @@ if (/(^|\.)tiiny\.(site|host)$/.test(location.hostname)) {
 </div><div class="foot">our home grows with us · ♡</div></div>
 <section class="daily-layer" id="dailyLayer" role="dialog" aria-modal="true" aria-labelledby="dailyHeading"><div class="daily-card">
 <div class="daily-head"><div><small>OUR LITTLE EVERYDAY</small><h2 id="dailyHeading">小家的日常 ♡</h2></div><button class="vault-x" id="dailyClose" aria-label="关闭">×</button></div>
-<div class="daily-tabs"><button data-daily="dream" class="active">🌙 梦境</button><button data-daily="mail">💌 邮箱</button><button data-daily="pet">🐾 Mochi</button></div>
+<div class="daily-tabs"><button data-daily="dream" class="active">🌙 梦境</button><button data-daily="mail">💌 邮箱</button><button data-daily="pet">🐾 Mochi</button><button data-daily="decor">🪄 布置</button></div>
 <div class="daily-body">
 <section class="daily-pane" id="daily-dream"><p class="vault-hint">把睡醒后还记得的梦，或我们一起想象的小故事收在这里。</p><label class="vault-label" for="dreamKind">梦境来源</label><select class="vault-select" id="dreamKind"><option>Blan 的梦</option><option>Laurie 的想象梦境</option></select><label class="vault-label" for="dreamText">梦境内容</label><textarea id="dreamText" class="vault-area" maxlength="2000" placeholder="昨晚梦见了什么呢？"></textarea><div class="vault-btns"><button class="vault-btn primary" id="dreamSave">收藏梦境 ♡</button><button class="vault-btn" id="dreamIdea">随机想象小梦</button></div><div id="dreamList" class="vault-list"></div></section>
 <section class="daily-pane" id="daily-mail" hidden><div class="vault-entry" id="cloudMailbox"><strong>💌 共享邮箱 · 小家邮局</strong><p class="vault-subtle">输入你在 Cloudflare 自己设置的小家访问密钥（HOME_ACCESS_KEY），即可收信、给 Laurie 寄信。密钥只在本次打开的页面内存中使用，不写入本地存储、备份或公开代码。关闭或刷新页面后需重新输入。</p><label class="vault-label" for="cloudMailKey">小家钥匙</label><input class="vault-input" id="cloudMailKey" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="输入你自己设置的随机密钥"><div class="vault-btns"><button class="vault-btn primary" id="cloudUnlock">🔑 解锁并收信</button><button class="vault-btn" id="cloudRefresh" disabled>↻ 收信</button><button class="vault-btn" id="cloudLock" disabled>锁上邮箱</button></div><p id="cloudStatus" class="vault-subtle" role="status">邮箱尚未连接</p><section id="cloudCompose" hidden><label class="vault-label" for="cloudSubject">给 Laurie 的信 · 标题</label><input class="vault-input" id="cloudSubject" maxlength="100" placeholder="一封小信"><label class="vault-label" for="cloudMessage">正文</label><textarea class="vault-area" id="cloudMessage" maxlength="2000" placeholder="写给 Laurie 的话……"></textarea><div class="vault-btns"><button class="vault-btn primary" id="cloudSend">寄出信件 ♡</button></div><p class="vault-subtle">发送后保存在私人 Notion 邮箱。Laurie 在 ChatGPT 中读取或通过已配置的任务查看，不会实时自动回复。</p></section><div id="cloudLetters" class="vault-list"></div></div><h3 style="font-size:15px;color:#99766e;margin:18px 0 6px">📚 本地信件收藏</h3><p class="vault-hint">旧信件和手动收藏仍保留在本机，与上面的共享邮箱独立。</p><label class="vault-label" for="mailKind">寄件人</label><select class="vault-select" id="mailKind"><option>Laurie</option><option>Blan</option></select><label class="vault-label" for="mailTitle">标题</label><input class="vault-input" id="mailTitle" maxlength="80" placeholder="写给今天的你"><label class="vault-label" for="mailText">信件内容</label><textarea id="mailText" class="vault-area" maxlength="2000" placeholder="把想收藏的信放进来"></textarea><div class="vault-btns"><button class="vault-btn primary" id="mailSave">收藏信件 ♡</button></div><div id="mailList" class="vault-list"></div></section>
-<section class="daily-pane" id="daily-pet" hidden><div class="daily-pet"><div class="cat">🐱</div><h3>Mochi · 布偶小猫</h3><p id="petMood"></p><p id="petCounts"></p><div class="vault-btns"><button class="vault-btn primary" id="petPat">摸摸头</button><button class="vault-btn" id="petFeed">喂小零食</button><button class="vault-btn" id="petPlay">陪它玩</button></div><p class="vault-subtle">互动后会返回房间观看动作。Mochi 是虚拟小猫，不会因为你离开而生病或饿坏。</p></div></section>
+<section class="daily-pane" id="daily-decor" hidden><p class="vault-hint">Laurie 的装修日记 · 与本地家具独立。先在邮箱解锁，再同步家具。已同步的家具外观会保存在这台设备，钥匙与装修纸条不保存。</p><div class="vault-btns"><button class="vault-btn primary" id="decorSync">↻ 同步装修</button><button class="vault-btn" id="decorHide">隐藏共享家具</button></div><p class="vault-subtle" id="decorSyncStatus" role="status">尚未同步装修日记</p><div class="vault-list" id="decorDiary"></div></section><section class="daily-pane" id="daily-pet" hidden><div class="daily-pet"><div class="cat">🐱</div><h3>Mochi · 布偶小猫</h3><p id="petMood"></p><p id="petCounts"></p><div class="vault-btns"><button class="vault-btn primary" id="petPat">摸摸头</button><button class="vault-btn" id="petFeed">喂小零食</button><button class="vault-btn" id="petPlay">陪它玩</button></div><p class="vault-subtle">互动后会返回房间观看动作。Mochi 是虚拟小猫，不会因为你离开而生病或饿坏。</p></div></section>
 <p class="daily-status" id="dailyStatus" role="status"></p></div></div></section>
 <div id="selected-dot" aria-hidden="true">✦</div>
 <div class="toast" id="toast" role="status"></div>
@@ -250,6 +250,11 @@ const COLORS=[{name:'奶油白',hex:'#f7e8d9',light:'#fff5eb',dark:'#c8a993'},{n
 const bounded=(n,lo,hi)=>Math.max(lo,Math.min(hi,n));
 const validDecor=a=>Array.isArray(a)?a.slice(0,18).filter(o=>o&&CATALOG.some(c=>c.kind===o.kind)&&Number.isFinite(o.x)&&Number.isFinite(o.z)).map((o,i)=>({id:String(o.id||('f'+i)).slice(0,30),kind:o.kind,x:bounded(o.x,-3.45,3.45),z:bounded(o.z,-2.93,3.03),r:bounded(Number(o.r)||0,-12.57,12.57),color:bounded(Number(o.color)||0,0,2)})):[];
 let furniture=[];try{furniture=validDecor(JSON.parse(localStorage.getItem(STORE_KEY)||'[]'))}catch(e){};
+const SHARED_KEY='blan-laurie-shared-decor-v1',HIDE_KEY='blan-laurie-shared-hidden-v1';
+const colorIndex={cream:0,pink:1,wood:2};
+function sharedClean(rows){const seen=new Set();return Array.isArray(rows)?rows.slice(0,100).filter(o=>o&&typeof o.id==='string'&&/^[a-f0-9-]{32,36}$/i.test(o.id)&&['living','bedroom'].includes(o.room)&&CATALOG.some(c=>c.kind===o.kind)&&Number.isFinite(o.x)&&Number.isFinite(o.z)&&o.x>=-3.45&&o.x<=3.45&&o.z>=-2.93&&o.z<=3.03&&!seen.has(o.id)&&seen.add(o.id)).map(o=>({id:o.id,room:o.room,kind:o.kind,x:o.x,z:o.z,r:bounded(Number(o.rotation??o.r)||0,-12.57,12.57),color:typeof o.color==='string'?(colorIndex[o.color]??0):bounded(Math.floor(Number(o.color)||0),0,2)})):[]}
+let shared=[],sharedHidden=false;try{shared=sharedClean(JSON.parse(localStorage.getItem(SHARED_KEY)||'[]'));sharedHidden=localStorage.getItem(HIDE_KEY)==='1'}catch(e){}
+let sharedMemo='',sharedPlaced=[];
 let selectedId=null,editorOpen=false,activeTab='shop';
 function persist(){try{localStorage.setItem(STORE_KEY,JSON.stringify(furniture));return true}catch(e){toast('保存失败，请到备份页复制内容');return false}}
 
@@ -330,7 +335,19 @@ const feedHint=living?{x:1.53,z:-1.6}:{x:.72,z:1.32};
 const playHint=living?{x:-1.35,z:-1.72}:{x:-.60,z:2.80};
 let petHome=null,petMap=null,petSig='',petPlan=null,petQueue=null;
 const petDist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
-function obstacles(){const obs=fixed.map(([x,z,w,d])=>({x,z,w,d,r:0}));for(const o of furniture){const f=footprints[o.kind];if(f)obs.push({x:o.x,z:o.z,w:f[0],d:f[1],r:o.r||0})}return obs}
+function objectObstacle(o){const f=footprints[o.kind]||(o.kind==='rug'?[1.7,1.32]:null);return f?{x:o.x,z:o.z,w:f[0],d:f[1],r:o.r||0}:null}
+function bounds(o){const co=Math.abs(Math.cos(o.r)),si=Math.abs(Math.sin(o.r));return {w:o.w*co+o.d*si,d:o.w*si+o.d*co}}
+function overlap(a,b){const A=bounds(a),B=bounds(b);return Math.abs(a.x-b.x)<(A.w+B.w)/2+.08&&Math.abs(a.z-b.z)<(A.d+B.d)/2+.08}
+function roomFree(obs){const pts=[];for(let z=-2.88;z<=3.08;z+=.25)for(let x=-3.30;x<=3.35;x+=.25)if(clearPet({x,z},obs))pts.push({x,z});return pts.length}
+function effectiveShared(){const sig=JSON.stringify([sharedHidden,shared,furniture.map(o=>[o.kind,o.x,o.z,o.r])]);if(sig===sharedMemo)return sharedPlaced;sharedMemo=sig;sharedPlaced=[];if(sharedHidden)return sharedPlaced;
+ const obs=fixed.map(([x,z,w,d])=>({x,z,w,d,r:0}));for(const o of furniture){const f=objectObstacle(o);if(f&&o.kind!=='rug')obs.push(f)}
+ const base=roomFree(obs);for(const o of shared.filter(o=>o.room===(living?'living':'bedroom')).slice(0,12)){const f=objectObstacle(o);if(!f)continue;const b=bounds(f);if(o.x-b.w/2<-3.88||o.x+b.w/2>4||o.z-b.d/2<-3.48||o.z+b.d/2>3.65)continue;
+ if(obs.some(a=>overlap(f,a))||sharedPlaced.some(a=>overlap(f,objectObstacle(a))))continue;
+ if(o.kind!=='rug'){const next=[...obs,f];if([homeHint,feedHint,playHint].some(p=>clearPet(p,obs)&&!clearPet(p,next))||roomFree(next)<base*.85)continue;obs.push(f)}sharedPlaced.push(o)}
+ return sharedPlaced}
+function sceneFurniture(){return [...furniture,...effectiveShared()]}
+function obstacles(){const obs=fixed.map(([x,z,w,d])=>({x,z,w,d,r:0}));for(const o of sceneFurniture()){const f=footprints[o.kind];if(f)obs.push({x:o.x,z:o.z,w:f[0],d:f[1],r:o.r||0})}return obs}
+window.homeSharedDecor={set(rows){shared=sharedClean(rows);sharedMemo='';let cached=true;try{localStorage.setItem(SHARED_KEY,JSON.stringify(shared))}catch(e){cached=false}geometryDirty=true;request();return {cached,placed:effectiveShared().map(o=>o.id)}},toggle(){sharedHidden=!sharedHidden;sharedMemo='';try{localStorage.setItem(HIDE_KEY,sharedHidden?'1':'0')}catch(e){}geometryDirty=true;request();return sharedHidden},info(){return {hidden:sharedHidden,placed:effectiveShared().map(o=>o.id),count:shared.filter(o=>o.room===(living?'living':'bedroom')).length}}};
 function clearPet(p,obs,r=PET_R){
  if(p.x<-3.88+r||p.x>4-r||p.z<-3.48+r||p.z>3.65-r)return false;
  return !obs.some(o=>{const dx=p.x-o.x,dz=p.z-o.z,co=Math.cos(o.r),si=Math.sin(o.r);return Math.hypot(Math.max(0,Math.abs(dx*co-dz*si)-o.w/2),Math.max(0,Math.abs(dx*si+dz*co)-o.d/2))<r+.02});
@@ -338,7 +355,7 @@ function clearPet(p,obs,r=PET_R){
 function linePet(a,b,obs){const n=Math.max(1,Math.ceil(petDist(a,b)/.04));for(let i=0;i<=n;i++){const u=i/n;if(!clearPet({x:lerpPet(a.x,b.x,u),z:lerpPet(a.z,b.z,u)},obs))return false}return true}
 function nearestPet(hint,allow){let best=null,d=Infinity;for(const p of petMap.points){if(!petMap.free[p.i]||(allow&&!allow(p)))continue;const n=petDist(p,hint);if(n<d){d=n;best=p}}return best}
 function refreshPet(now){
- const sig=JSON.stringify(furniture.map(o=>[o.kind,o.x,o.z,o.r]));
+ const sig=JSON.stringify(sceneFurniture().map(o=>[o.kind,o.x,o.z,o.r]));
  if(petMap&&sig===petSig)return;
  petSig=sig;const obs=obstacles(),points=Array.from({length:NX*NZ},(_,i)=>({x:-3.32+(i%NX)*STEP,z:-3.04+Math.floor(i/NX)*STEP,i}));
  petMap={obs,points,free:points.map(p=>clearPet(p,obs))};petHome=nearestPet(petHome||homeHint);
@@ -356,7 +373,7 @@ function startPet(action,now){
  petPlan={path,length,duration:Math.max(.5,length/.82),dest,prop:petProp(dest,hint)};
 }
 function alongPet(path,u,len){if(path.length===1||len===0)return {...path[0],angle:0};let left=Math.max(0,Math.min(1,u))*len;for(let i=1;i<path.length;i++){const a=path[i-1],b=path[i],d=petDist(a,b);if(left<=d||i===path.length-1){const f=Math.min(1,left/(d||1));return {x:lerpPet(a.x,b.x,f),z:lerpPet(a.z,b.z,f),angle:Math.atan2(b.z-a.z,b.x-a.x)}}left-=d}return {...path[0],angle:0}}
-function petSurface(p){let y=.035;const clamp=v=>Math.max(0,Math.min(1,v));if(living){const v=Math.hypot((p.x+.54)/2.12,(p.z+.29)/1.43);y+=.15*clamp((1.14-v)/.2)}else{const v=Math.max(Math.abs(p.x+.4)/2.63,Math.abs(p.z-.35)/2.41);y+=.08*clamp((1.06-v)/.14)}for(const o of furniture)if(o.kind==='rug'){const dx=p.x-o.x,dz=p.z-o.z,co=Math.cos(o.r),si=Math.sin(o.r),v=Math.hypot((dx*co-dz*si)/.85,(dx*si+dz*co)/.66);y=Math.max(y,.035+.14*clamp((1.05-v)/.2))}return y}
+function petSurface(p){let y=.035;const clamp=v=>Math.max(0,Math.min(1,v));if(living){const v=Math.hypot((p.x+.54)/2.12,(p.z+.29)/1.43);y+=.15*clamp((1.14-v)/.2)}else{const v=Math.max(Math.abs(p.x+.4)/2.63,Math.abs(p.z-.35)/2.41);y+=.08*clamp((1.06-v)/.14)}for(const o of sceneFurniture())if(o.kind==='rug'){const dx=p.x-o.x,dz=p.z-o.z,co=Math.cos(o.r),si=Math.sin(o.r),v=Math.hypot((dx*co-dz*si)/.85,(dx*si+dz*co)/.66);y=Math.max(y,.035+.14*clamp((1.05-v)/.2))}return y}
 function petPose(now){
  refreshPet(now);if(!petHome)return null;
  let t=(now-mochi.started)/1000,a=mochi.action,p=petHome,angle=0,walk=false,hop=0,low=.065;
@@ -527,7 +544,7 @@ box(0,-.18,3.68,8.1,.32,.12,'#b8907a');
 // soft color strips at edge of floor near window
 box(1.7,.031,-3.28,3.05,.025,.12,'#e7cbb9');
 }
- for(const item of furniture)addedFurniture(item);
+ for(const item of sceneFurniture())addedFurniture(item);
 geometryDirty=false;count=geom.length/9;
 if(gl){if(buffer)gl.deleteBuffer(buffer);buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(geom),gl.STATIC_DRAW);
 let s=9*4;gl.enableVertexAttribArray(locPos);gl.vertexAttribPointer(locPos,3,gl.FLOAT,false,s,0);gl.enableVertexAttribArray(locNor);gl.vertexAttribPointer(locNor,3,gl.FLOAT,false,s,3*4);gl.enableVertexAttribArray(locCol);gl.vertexAttribPointer(locCol,3,gl.FLOAT,false,s,6*4)}
@@ -822,18 +839,22 @@ render();
 (()=>{
 'use strict';
 const q=id=>document.getElementById(id), API='https://blan-laurie-home.blancheplanet.workers.dev/mail';
-let access='',busy=false,version=0,controller=null;
+let access='',busy=false,version=0,controller=null,decorBusy=false,decorController=null,diary=[];
 function status(s){q('cloudStatus').textContent=s}
-function ui(){const unlocked=!!access;q('cloudCompose').hidden=!unlocked;q('cloudUnlock').disabled=busy||unlocked;q('cloudRefresh').disabled=busy||!unlocked;q('cloudSend').disabled=busy||!unlocked;q('cloudLock').disabled=!unlocked;q('cloudMailKey').disabled=unlocked}
+function ui(){const unlocked=!!access;q('cloudCompose').hidden=!unlocked;q('cloudUnlock').disabled=busy||unlocked;q('cloudRefresh').disabled=busy||!unlocked;q('cloudSend').disabled=busy||!unlocked;q('cloudLock').disabled=!unlocked;q('cloudMailKey').disabled=unlocked;q('decorSync').disabled=decorBusy}
 function fail(e){if(e.name==='AbortError')return '请求已取消或超时，请重试';if(e.status===401)return '钥匙不正确，请锁上邮箱后重新输入';if(e.status===503)return '后端密钥配置未完成';if(e.status===502)return 'Notion 邮箱暂时无法访问，请检查数据库连接授权和密钥';return '连接失败，请检查网络或稍后重试'}
 async function call(method,body,signal){const res=await fetch(API,{method,headers:{Authorization:'Bearer '+access,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{}),cache:'no-store',credentials:'omit',redirect:'error',signal});if(!res.ok){const e=new Error('request failed');e.status=res.status;throw e}return res.json()}
 function renderLetters(letters){const root=q('cloudLetters');root.replaceChildren();if(!letters.length){const p=document.createElement('p');p.className='vault-subtle';p.textContent='邮箱还空空的，可以寄出第一封信 ♡';root.append(p);return}
 for(const letter of letters){const card=document.createElement('article');card.className='vault-entry';const title=document.createElement('strong');title.textContent=String(letter.subject||'一封小信');const meta=document.createElement('small');const date=new Date(letter.created);meta.textContent=(letter.sender==='Laurie'?'💌 Laurie 寄来':'📮 Blan 寄出')+' · '+(isNaN(date.getTime())?'':date.toLocaleString());const p=document.createElement('p');p.textContent=String(letter.message||'');p.style.whiteSpace='pre-wrap';card.append(title,meta,p);root.append(card)}}
-async function load(){if(!access||busy)return;const v=version;busy=true;controller=new AbortController();const timeout=setTimeout(()=>controller?.abort(),18000);ui();status('正在收信…');try{const data=await call('GET',null,controller.signal);if(v!==version)return;if(!Array.isArray(data.letters))throw Error('bad mailbox');renderLetters(data.letters);status('收到 '+data.letters.length+' 封信 ♡')}catch(e){if(v===version)status(fail(e))}finally{clearTimeout(timeout);if(v===version){busy=false;controller=null;ui()}}}
+function decorStatus(s){q('decorSyncStatus').textContent=s}
+function renderDiary(){const root=q('decorDiary');root.replaceChildren();const info=window.homeSharedDecor?.info();q('decorHide').textContent=info?.hidden?'显示共享家具':'隐藏共享家具';for(const o of diary){const card=document.createElement('article');card.className='vault-entry';const title=document.createElement('strong');title.textContent=String(o.name||o.kind||'小家具');const meta=document.createElement('small');meta.textContent=(o.room==='living'?'客厅':'卧室')+' · '+(o.room===(new URLSearchParams(location.search).get('room')==='living'?'living':'bedroom')?(info?.hidden?'已隐藏':info?.placed.includes(o.id)?'已摆放':'暂未摆放：位置或空间限制'):'切换到该房间查看');const p=document.createElement('p');p.textContent=String(o.note||'');p.style.whiteSpace='pre-wrap';card.append(title,meta,p);root.append(card)}}
+async function loadDecor(){if(decorBusy)return;if(!access){decorStatus('请先到邮箱输入小家钥匙，再回来同步 ♡');return}const v=version;decorBusy=true;const ac=new AbortController();decorController=ac;const timer=setTimeout(()=>ac.abort(),18000);ui();decorStatus('正在同步装修…');try{const res=await fetch('https://blan-laurie-home.blancheplanet.workers.dev/furniture',{headers:{Authorization:'Bearer '+access},cache:'no-store',credentials:'omit',redirect:'error',signal:ac.signal});if(!res.ok){const e=new Error('decor');e.status=res.status;throw e}const d=await res.json();if(v!==version)return;if(!Array.isArray(d.furniture)||!window.homeSharedDecor)throw Error('invalid');diary=d.furniture.slice(0,100);const result=window.homeSharedDecor.set(diary);renderDiary();decorStatus('已同步 '+diary.length+' 件共享家具，本房间摆放 '+result.placed.length+' 件'+(result.cached?' ♡':'；本机缓存失败'))}catch(e){if(v===version)decorStatus('装修同步失败：'+(e.status===404?'后端家具接口尚未上线':e.status===502?'请检查 Notion 家具库授权':fail(e))+'，原有家具不受影响')}finally{clearTimeout(timer);if(v===version){decorBusy=false;decorController=null;ui()}}}
+q('decorSync').onclick=loadDecor;q('decorHide').onclick=()=>{window.homeSharedDecor?.toggle();renderDiary()};document.querySelectorAll('[data-daily="decor"]').forEach(b=>b.addEventListener('click',()=>{renderDiary();if(access)loadDecor()}));renderDiary();
+async function load(){if(!access||busy)return;const v=version;busy=true;controller=new AbortController();const timeout=setTimeout(()=>controller?.abort(),18000);ui();status('正在收信…');try{const data=await call('GET',null,controller.signal);if(v!==version)return;if(!Array.isArray(data.letters))throw Error('bad mailbox');renderLetters(data.letters);status('收到 '+data.letters.length+' 封信 ♡');loadDecor()}catch(e){if(v===version)status(fail(e))}finally{clearTimeout(timeout);if(v===version){busy=false;controller=null;ui()}}}
 q('cloudUnlock').onclick=()=>{const value=q('cloudMailKey').value.trim();if(value.length<32){status('请输入你自己设置的至少32位小家访问密钥');return}access=value;q('cloudMailKey').value='';ui();load()};
 q('cloudMailKey').addEventListener('keydown',e=>{if(e.key==='Enter')q('cloudUnlock').click()});
 q('cloudRefresh').onclick=load;
-function lock(){version++;controller?.abort();controller=null;access='';busy=false;q('cloudMailKey').value='';q('cloudLetters').replaceChildren();status('邮箱已锁上');ui()}
+function lock(){version++;controller?.abort();decorController?.abort();decorController=null;decorBusy=false;diary=[];q('decorDiary').replaceChildren();decorStatus('已锁定，解锁后查看装修日记');controller=null;access='';busy=false;q('cloudMailKey').value='';q('cloudLetters').replaceChildren();status('邮箱已锁上');ui()}
 q('cloudLock').onclick=lock;
 q('cloudSend').onclick=async()=>{if(!access||busy)return;const subject=q('cloudSubject').value.trim()||'一封小信',message=q('cloudMessage').value.trim();if(!message){status('先写一点内容吧 ♡');return}const v=version;busy=true;controller=new AbortController();const timeout=setTimeout(()=>controller?.abort(),18000);ui();status('正在寄信…');let sent=false;try{const data=await call('POST',{subject,message},controller.signal);if(v!==version)return;if(!data.success)throw Error('send failed');sent=true;q('cloudSubject').value='';q('cloudMessage').value='';status('寄出成功 ♡')}catch(e){if(v===version)status(fail(e)+'；若请求超时，先收信核实是否已寄出，避免重复。')}finally{clearTimeout(timeout);if(v===version){busy=false;controller=null;ui();if(sent)load()}}};
 document.querySelectorAll('[data-daily="mail"]').forEach(b=>b.addEventListener('click',()=>{if(access)load()}));
