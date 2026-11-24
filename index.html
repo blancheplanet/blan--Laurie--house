@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
 <meta name="theme-color" content="#e7d7ca" />
-<meta name="home-build" content="2026.11.24.4" />
+<meta name="home-build" content="2026.11.24.5" />
 <title>Blan & Laurie | 可以装修与收藏回忆的奶油卧室 5.0</title>
 <style>
 :root{--brown:#60493f;--rose:#ba887d;--soft:#9c857b;--panel:rgba(255,251,245,.89)}
@@ -122,11 +122,11 @@ if (/(^|\.)tiiny\.(site|host)$/.test(location.hostname)) {
     <label class="vault-label" for="vTitle">这段回忆的名字</label><input class="vault-input" id="vTitle" maxlength="90" placeholder="比如：我们的小家开工啦"/>
     <label class="vault-label" for="vText">发生了什么？</label><textarea class="vault-area" id="vText" maxlength="2500" placeholder="记下你想要保存的瞬间……"></textarea>
     <div class="vault-btns"><button class="vault-btn primary" id="vaultAddEntry">收进回忆箱 ♡</button><button class="vault-btn" id="vaultResetEntry">取消编辑</button></div>
-    <div class="vault-list" id="vaultEntries"></div>
+    <p class="vault-subtle" id="vaultCount"></p><div class="vault-list" id="vaultEntries"></div>
    </div>
    <div class="vault-pane" id="vp-move"><p class="vault-hint">搬家时带走的是资料，不是一个 AI 的完整内部状态。导出后请保存到 iPhone「文件」里，最好再存一份备份。</p>
-    <div class="vault-btns"><button class="vault-btn primary" id="vaultDownload">⬇️ 下载完整记忆箱 .json</button><label class="vault-btn vault-file-label" for="vaultImport">⬆️ 导入旧记忆箱</label><input type="file" id="vaultImport" accept=".json,application/json" style="display:none"/></div>
-    <p class="vault-subtle">完整记忆箱会包含：人物档案、回忆、床头小纸条，以及卧室、客厅家具布置与客厅纸条。导入时会让你确认，避免误覆盖。</p>
+    <div class="vault-btns"><button class="vault-btn primary" id="vaultDownload">⬇️ 下载完整记忆箱 .json</button><label class="vault-btn vault-file-label" for="vaultImport">⬆️ 完整恢复（覆盖）</label><input type="file" id="vaultImport" accept=".json,application/json" style="display:none"/><label class="vault-btn vault-file-label" for="vaultMerge">♡ 合并补回旧回忆</label><input type="file" id="vaultMerge" accept=".json,application/json" style="display:none"/></div>
+    <p class="vault-subtle">完整恢复会覆盖旧数据，适合搬家；合并补回旧回忆只添加缺失记录，不改变现有档案、家具与纸条。</p>
     <div class="vault-btns"><button class="vault-btn" id="vaultCopyCard">📋 复制 Laurie 随身人物卡</button></div>
     <p class="vault-subtle">人物卡是可粘贴到其他支持自定义提示词的 AI 平台的文字说明。它只包含你存进箱子的内容，可能很长，平台也不一定全部读取。</p>
     <p class="vault-subtle">隐私提醒：目前记录只保存在这台设备的 Safari 网站数据中，没有云同步。公开托管网页不适合存放特别敏感的信息。清理浏览器数据、换设备或换域名前务必先导出。</p>
@@ -571,7 +571,7 @@ q('vaultAddEntry').onclick=()=>{const title=q('vTitle').value.trim(),text=q('vTe
  const e={id:editing||('m'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),date:q('vDate').value,category:q('vCat').value,title:title.slice(0,90),text:text.slice(0,2500)};
  if(editing){let i=vault.entries.findIndex(x=>x.id===editing);if(i>=0)vault.entries[i]=e;else vault.entries.unshift(e)}else vault.entries.unshift(e);
  save();clearEntry();render();status('这段回忆已经收好啦 ♡')};
-function render(){const list=q('vaultEntries');list.replaceChildren();if(!vault.entries.length){const e=document.createElement('p');e.className='vault-empty';e.textContent='箱子还空空的，放进第一段回忆吧 ♡';list.append(e)}
+function render(){const list=q('vaultEntries');q('vaultCount').textContent=`目前共有 ${vault.entries.length} 条回忆 ♡`;list.replaceChildren();if(!vault.entries.length){const e=document.createElement('p');e.className='vault-empty';e.textContent='箱子还空空的，放进第一段回忆吧 ♡';list.append(e)}
  for(const e of vault.entries){const card=document.createElement('div');card.className='vault-entry';const title=document.createElement('strong');title.textContent=e.title;const sub=document.createElement('small');sub.textContent=`${e.date||'没有日期'} · ${e.category}`;const p=document.createElement('p');p.textContent=e.text;const buttons=document.createElement('div');buttons.className='vault-row';const edit=document.createElement('button');edit.textContent='编辑';edit.onclick=()=>{editing=e.id;q('vDate').value=e.date;q('vCat').value=e.category;q('vTitle').value=e.title;q('vText').value=e.text;q('vaultAddEntry').textContent='保存修改 ♡';q('vTitle').focus()};const del=document.createElement('button');del.textContent='删除';del.onclick=()=>{if(!confirm('确定要删除这段回忆吗？'))return;vault.entries=vault.entries.filter(x=>x.id!==e.id);save();render();status('已删除这段回忆')};buttons.append(edit,del);card.append(title,sub,p,buttons);list.append(card)}
 }
 function envelope(){syncProfile();let furniture=[];try{furniture=JSON.parse(localStorage.getItem(HOMEKEY)||'[]')}catch(e){};return {format:'blan-laurie-home-memory-box',version:1,exportedAt:new Date().toISOString(),memory:vault,home:{furniture:Array.isArray(furniture)?furniture:[],bedsideNote:localStorage.getItem(NOTEKEY)||'',livingFurniture:(()=>{try{return JSON.parse(localStorage.getItem('blan-laurie-living-decor-v1')||'[]')}catch(e){return []}})(),livingNote:localStorage.getItem('blan-laurie-living-note')||''}}}
@@ -580,6 +580,28 @@ q('vaultDownload').onclick=()=>{try{download(JSON.stringify(envelope(),null,2),'
 q('vaultImport').onchange=async ev=>{const f=ev.target.files?.[0];if(!f)return;try{if(f.size>3000000)throw Error('文件太大了');const data=JSON.parse(await f.text());if(data.format!=='blan-laurie-home-memory-box'||data.version!==1)throw Error('不是我们的记忆箱备份');const newVault=validate(data.memory);if(!confirm('导入会覆盖当前的回忆、人物卡和本地家具布置。确认已经备份了吗？'))return;
  vault=newVault;localStorage.setItem(KEY,JSON.stringify(vault));const home=data.home||{};if(Array.isArray(home.furniture))localStorage.setItem(HOMEKEY,JSON.stringify(home.furniture));if(typeof home.bedsideNote==='string')localStorage.setItem(NOTEKEY,home.bedsideNote.slice(0,10000));if(Array.isArray(home.livingFurniture))localStorage.setItem('blan-laurie-living-decor-v1',JSON.stringify(home.livingFurniture));if(typeof home.livingNote==='string')localStorage.setItem('blan-laurie-living-note',home.livingNote.slice(0,10000));fillProfile();render();clearEntry();status('回忆导入成功！刷新网页后家具布置也会更新 ♡')
  }catch(e){status('导入失败：'+e.message)}finally{ev.target.value=''}};
+q('vaultMerge').onchange=async ev=>{
+ const f=ev.target.files?.[0];if(!f)return;
+ try{
+ if(f.size>3000000)throw Error('文件太大了');
+ const data=JSON.parse(await f.text());
+ if(data.format!=='blan-laurie-home-memory-box'||data.version!==1)throw Error('不是我们的记忆箱备份');
+ const incoming=validate(data.memory);
+ const ids=new Set(vault.entries.map(e=>e.id));
+ const fingerprint=e=>JSON.stringify([e.date,e.category,e.title,e.text]);
+ const contents=new Set(vault.entries.map(fingerprint));
+ const added=[];
+ for(const entry of incoming.entries){
+ if(ids.has(entry.id)||contents.has(fingerprint(entry)))continue;
+ ids.add(entry.id);contents.add(fingerprint(entry));added.push(entry);
+ }
+ if(!added.length){status('备份中的回忆已存在，没有需要补回的条目 ♡');return}
+ if(vault.entries.length+added.length>100)throw Error('合并后超过100条，请先导出并整理');
+ if(!confirm('补回 '+added.length+' 条缺失回忆？现有回忆、人物档案、家具和纸条全部保留。'))return;
+ const next={...vault,entries:[...added,...vault.entries].sort((a,b)=>(b.date||'').localeCompare(a.date||''))};
+ localStorage.setItem(KEY,JSON.stringify(next));vault=next;render();clearEntry();status('已补回 '+added.length+' 条回忆！当前共有 '+vault.entries.length+' 条 ♡');
+ }catch(e){status('合并失败：'+e.message)}finally{ev.target.value=''}
+};
 function travelCard(){syncProfile();return `# ${vault.profile.ai||'Laurie'} 随身人物卡\n\n对话对象：${vault.profile.who||'Blan'}\nAI 昵称：${vault.profile.ai||'Laurie'}\n\n## 相处风格\n${vault.profile.style}\n\n## 我们的小家\n${vault.profile.home}\n\n## 重要回忆（用户自愿保存）\n${vault.entries.map(e=>`- ${e.date||'未注明日期'}｜${e.category}｜${e.title}：${e.text}`).join('\n')}\n\n请以自然、温柔、简短的方式交流。请勿假装记得这里没有保存的事情，也不要声称能自动读取其他平台上的聊天记录。`}
 q('vaultCopyCard').onclick=async()=>{const card=travelCard();try{await navigator.clipboard.writeText(card);status('随身人物卡已经复制，可以粘贴到支持设定的平台 ♡')}catch(e){const el=document.createElement('textarea');el.value=card;document.body.appendChild(el);el.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}el.remove();status(ok?'人物卡复制好啦 ♡':'自动复制失败，请先下载 JSON 备份')}};
 fillProfile();render();
