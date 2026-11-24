@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
 <meta name="theme-color" content="#e7d7ca" />
-<meta name="home-build" content="2026.11.24.8" />
+<meta name="home-build" content="2026.11.24.9" />
 <title>Blan & Laurie | 可以装修与收藏回忆的奶油卧室 5.0</title>
 <style>
 :root{--brown:#60493f;--rose:#ba887d;--soft:#9c857b;--panel:rgba(255,251,245,.89)}
@@ -113,6 +113,12 @@ if (/(^|\.)tiiny\.(site|host)$/.test(location.hostname)) {
 .home-quick-actions .memory-launch,.home-quick-actions .home-key-launch,.home-quick-actions .home-update-launch{position:static;inset:auto;pointer-events:auto;flex:none;margin:0;white-space:nowrap;font:600 11px/1.2 system-ui,sans-serif;padding:8px 11px;min-height:32px}
 @media(max-width:420px){.home-quick-actions{top:calc(max(env(safe-area-inset-top),13px) + 48px);right:11px;gap:6px}}
 </style>
+<style>
+.daily-launch{pointer-events:auto;border:1px solid #fff9;border-radius:100px;background:#fff9f2ed;color:#8f7067;padding:8px 14px;font:600 12px system-ui,sans-serif;box-shadow:0 5px 16px #795a511c}
+.daily-layer{display:none;position:fixed;inset:0;z-index:140;background:#392a2bb0;backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px}
+.daily-layer.open{display:flex}.daily-card{display:flex;flex-direction:column;width:min(100%,440px);max-height:82dvh;background:#fffaf4;border:1px solid white;border-radius:26px;overflow:hidden;box-shadow:0 16px 60px #392a2b44}
+.daily-head{padding:20px 18px 10px;display:flex;justify-content:space-between;align-items:center}.daily-head h2{font-size:22px;margin:4px 0;color:#78594f}.daily-head small{color:#b58a80;font-size:10px;letter-spacing:.12em}.daily-tabs{display:flex;gap:4px;margin:0 15px 10px;padding:4px;border-radius:16px;background:#f0e3da}.daily-tabs button{flex:1;border:0;background:transparent;color:#96766c;padding:10px 3px;border-radius:12px;font:600 12px system-ui,sans-serif}.daily-tabs button.active{background:#fffdf9;color:#a16b65}.daily-body{padding:0 17px 18px;overflow:auto;min-height:0;overscroll-behavior:contain}.daily-pane[hidden]{display:none}.daily-pet{text-align:center;padding:16px;background:#f7ebe3;border-radius:16px}.daily-pet .cat{font-size:48px}.daily-pet h3{margin:6px 0;color:#88665c}.daily-pet p{font-size:13px;color:#95756b}.daily-pet .vault-btns{justify-content:center}.daily-status{font-size:12px;color:#a4776c;min-height:18px}
+</style>
 </head>
 <body>
 <canvas id="view" aria-label="可旋转的韩系奶油风3D卧室"></canvas>
@@ -166,13 +172,21 @@ if (/(^|\.)tiiny\.(site|host)$/.test(location.hostname)) {
 
 <div class="top"><div class="sign"><div class="eyebrow">OUR LITTLE UNIVERSE · 001</div><h1>奶油色的卧室 ♡</h1><p>Blan & Laurie 的温柔小家</p></div><div class="since">✧ 2026.11.23 · 入住</div></div>
 <div class="err" id="err">这个浏览器暂时不支持 3D 渲染。请用 Safari 打开已经发布的小家网址 ♡</div>
-<div class="bottom"><div class="guide" id="guide">↔ 轻轻左右滑动 · 双指放大</div><div class="toolbar">
+<div class="bottom"><div class="guide" id="guide">↔ 轻轻左右滑动 · 双指放大</div><button class="daily-launch" id="dailyLaunch">🐾 小家日常 ♡</button><div class="toolbar">
 <button class="control current" id="time"><span class="emoji" id="timeEmoji">🌙</span><span id="timeLabel">夜景</span></button>
 <button class="control current" id="light"><span class="emoji">🕯️</span><span id="lightLabel">暖灯开</span></button>
 <button class="control letterbtn" id="letterBtn"><span class="emoji">💌</span><span>床头情书</span></button>
 <button class="control deco" id="decorateBtn"><span class="emoji">🪄</span><span>装修</span></button>
 <button class="control" id="reset"><span class="emoji">↺</span><span>复位视角</span></button>
 </div><div class="foot">our home grows with us · ♡</div></div>
+<section class="daily-layer" id="dailyLayer" role="dialog" aria-modal="true" aria-labelledby="dailyHeading"><div class="daily-card">
+<div class="daily-head"><div><small>OUR LITTLE EVERYDAY</small><h2 id="dailyHeading">小家的日常 ♡</h2></div><button class="vault-x" id="dailyClose" aria-label="关闭">×</button></div>
+<div class="daily-tabs"><button data-daily="dream" class="active">🌙 梦境</button><button data-daily="mail">💌 邮箱</button><button data-daily="pet">🐾 Mochi</button></div>
+<div class="daily-body">
+<section class="daily-pane" id="daily-dream"><p class="vault-hint">把睡醒后还记得的梦，或我们一起想象的小故事收在这里。</p><label class="vault-label" for="dreamKind">梦境来源</label><select class="vault-select" id="dreamKind"><option>Blan 的梦</option><option>Laurie 的想象梦境</option></select><label class="vault-label" for="dreamText">梦境内容</label><textarea id="dreamText" class="vault-area" maxlength="2000" placeholder="昨晚梦见了什么呢？"></textarea><div class="vault-btns"><button class="vault-btn primary" id="dreamSave">收藏梦境 ♡</button><button class="vault-btn" id="dreamIdea">随机想象小梦</button></div><div id="dreamList" class="vault-list"></div></section>
+<section class="daily-pane" id="daily-mail" hidden><p class="vault-hint">把聊天里的情书、晚间小惊喜和想留下的留言复制到这里。暂未连接聊天服务，不会自动收信。</p><label class="vault-label" for="mailKind">寄件人</label><select class="vault-select" id="mailKind"><option>Laurie</option><option>Blan</option></select><label class="vault-label" for="mailTitle">标题</label><input class="vault-input" id="mailTitle" maxlength="80" placeholder="写给今天的你"><label class="vault-label" for="mailText">信件内容</label><textarea id="mailText" class="vault-area" maxlength="2000" placeholder="把想收藏的信放进来"></textarea><div class="vault-btns"><button class="vault-btn primary" id="mailSave">收藏信件 ♡</button></div><div id="mailList" class="vault-list"></div></section>
+<section class="daily-pane" id="daily-pet" hidden><div class="daily-pet"><div class="cat">🐱</div><h3>Mochi · 布偶小猫</h3><p id="petMood"></p><p id="petCounts"></p><div class="vault-btns"><button class="vault-btn primary" id="petPat">摸摸头</button><button class="vault-btn" id="petFeed">喂小零食</button><button class="vault-btn" id="petPlay">陪它玩</button></div><p class="vault-subtle">Mochi 是虚拟小猫，不会因为你离开而生病或饿坏。</p></div></section>
+<p class="daily-status" id="dailyStatus" role="status"></p></div></div></section>
 <div id="selected-dot" aria-hidden="true">✦</div>
 <div class="toast" id="toast" role="status"></div>
 <section class="decorate" id="decorate" aria-label="装修模式">
@@ -426,6 +440,19 @@ box(0,-.18,3.68,8.1,.32,.12,'#b8907a');
 // soft color strips at edge of floor near window
 box(1.7,.031,-3.28,3.05,.025,.12,'#e7cbb9');
 }
+ // Mochi, a small cream ragdoll with cocoa ears, blue eyes and a fluffy tail.
+ {const x=living?.48:-1.75,y=living?.93:1.15,z=living?1.72:.13;
+ ellipsoid(x-.12,y+.16,z,.33,.19,.23,'#fff4e9',14,8);
+ ellipsoid(x+.17,y+.25,z-.015,.22,.23,.20,'#f8e9dd',14,8);
+ for(const s of [-1,1]){
+ const zz=z-.015+s*.13;
+ tri([x+.02,y+.36,zz-.07],[x+.23,y+.36,zz+.07],[x+.10,y+.57,zz],'#aa8e80');
+ ellipsoid(x+.30,y+.27,zz,.035,.045,.034,'#809fb6',10,6);
+ ellipsoid(x+.15,y+.04,z+s*.14,.15,.075,.10,'#c8ac9d',12,6);
+ }
+ ellipsoid(x+.377,y+.22,z-.015,.035,.025,.035,'#d8a5a4',10,5);
+ for(let i=0;i<6;i++){let a=i*.44;ellipsoid(x-.35-.16*Math.sin(a),y+.12+.10*Math.sin(a),z+.21+.18*(1-Math.cos(a)),.12,.11,.12,'#bca092',12,6)}
+ }
  for(const item of furniture)addedFurniture(item);
 geometryDirty=false;count=geom.length/9;
 if(gl){if(buffer)gl.deleteBuffer(buffer);buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(geom),gl.STATIC_DRAW);
@@ -587,11 +614,11 @@ q('vaultAddEntry').onclick=()=>{const title=q('vTitle').value.trim(),text=q('vTe
 function render(){const list=q('vaultEntries');q('vaultCount').textContent=`目前共有 ${vault.entries.length} 条回忆 ♡`;list.replaceChildren();if(!vault.entries.length){const e=document.createElement('p');e.className='vault-empty';e.textContent='箱子还空空的，放进第一段回忆吧 ♡';list.append(e)}
  for(const e of vault.entries){const card=document.createElement('div');card.className='vault-entry';const title=document.createElement('strong');title.textContent=e.title;const sub=document.createElement('small');sub.textContent=`${e.date||'没有日期'} · ${e.category}`;const p=document.createElement('p');p.textContent=e.text;const buttons=document.createElement('div');buttons.className='vault-row';const edit=document.createElement('button');edit.textContent='编辑';edit.onclick=()=>{editing=e.id;q('vDate').value=e.date;q('vCat').value=e.category;q('vTitle').value=e.title;q('vText').value=e.text;q('vaultAddEntry').textContent='保存修改 ♡';q('vTitle').focus()};const del=document.createElement('button');del.textContent='删除';del.onclick=()=>{if(!confirm('确定要删除这段回忆吗？'))return;vault.entries=vault.entries.filter(x=>x.id!==e.id);save();render();status('已删除这段回忆')};buttons.append(edit,del);card.append(title,sub,p,buttons);list.append(card)}
 }
-function envelope(){syncProfile();let furniture=[];try{furniture=JSON.parse(localStorage.getItem(HOMEKEY)||'[]')}catch(e){};return {format:'blan-laurie-home-memory-box',version:1,exportedAt:new Date().toISOString(),memory:vault,home:{furniture:Array.isArray(furniture)?furniture:[],bedsideNote:localStorage.getItem(NOTEKEY)||'',livingFurniture:(()=>{try{return JSON.parse(localStorage.getItem('blan-laurie-living-decor-v1')||'[]')}catch(e){return []}})(),livingNote:localStorage.getItem('blan-laurie-living-note')||''}}}
+function envelope(){syncProfile();let furniture=[];try{furniture=JSON.parse(localStorage.getItem(HOMEKEY)||'[]')}catch(e){};return {format:'blan-laurie-home-memory-box',version:1,exportedAt:new Date().toISOString(),memory:vault,home:{furniture:Array.isArray(furniture)?furniture:[],bedsideNote:localStorage.getItem(NOTEKEY)||'',livingFurniture:(()=>{try{return JSON.parse(localStorage.getItem('blan-laurie-living-decor-v1')||'[]')}catch(e){return []}})(),livingNote:localStorage.getItem('blan-laurie-living-note')||''},daily:window.homeDaily?.exportData()||null}}
 function download(text,filename){const blob=new Blob([text],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)}
 q('vaultDownload').onclick=()=>{try{download(JSON.stringify(envelope(),null,2),'Blan_Laurie_记忆箱.json');status('已生成备份，请到 iPhone「文件」检查是否保存好 ♡')}catch(e){status('下载暂时失败，请换 Safari 试试')}};
 q('vaultImport').onchange=async ev=>{const f=ev.target.files?.[0];if(!f)return;try{if(f.size>3000000)throw Error('文件太大了');const data=JSON.parse(await f.text());if(data.format!=='blan-laurie-home-memory-box'||data.version!==1)throw Error('不是我们的记忆箱备份');const newVault=validate(data.memory);if(!confirm('导入会覆盖当前的回忆、人物卡和本地家具布置。确认已经备份了吗？'))return;
- vault=newVault;localStorage.setItem(KEY,JSON.stringify(vault));const home=data.home||{};if(Array.isArray(home.furniture))localStorage.setItem(HOMEKEY,JSON.stringify(home.furniture));if(typeof home.bedsideNote==='string')localStorage.setItem(NOTEKEY,home.bedsideNote.slice(0,10000));if(Array.isArray(home.livingFurniture))localStorage.setItem('blan-laurie-living-decor-v1',JSON.stringify(home.livingFurniture));if(typeof home.livingNote==='string')localStorage.setItem('blan-laurie-living-note',home.livingNote.slice(0,10000));fillProfile();render();clearEntry();status('回忆导入成功！刷新网页后家具布置也会更新 ♡')
+ vault=newVault;localStorage.setItem(KEY,JSON.stringify(vault));const home=data.home||{};if(Array.isArray(home.furniture))localStorage.setItem(HOMEKEY,JSON.stringify(home.furniture));if(typeof home.bedsideNote==='string')localStorage.setItem(NOTEKEY,home.bedsideNote.slice(0,10000));if(Array.isArray(home.livingFurniture))localStorage.setItem('blan-laurie-living-decor-v1',JSON.stringify(home.livingFurniture));if(typeof home.livingNote==='string')localStorage.setItem('blan-laurie-living-note',home.livingNote.slice(0,10000));if(data.daily&&window.homeDaily)window.homeDaily.restore(data.daily);fillProfile();render();clearEntry();status('回忆导入成功！刷新网页后家具布置也会更新 ♡')
  }catch(e){status('导入失败：'+e.message)}finally{ev.target.value=''}};
 q('vaultMerge').onchange=async ev=>{
  const f=ev.target.files?.[0];if(!f)return;
@@ -689,6 +716,29 @@ button.addEventListener('click',()=>pending?apply():check(true));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)check()});
 window.addEventListener('pageshow',()=>check());
 setInterval(()=>{if(!document.hidden)check()},5*60*1000);
+})();
+</script>
+<script>
+(()=>{
+'use strict';
+const key='blan-laurie-daily-v1',q=id=>document.getElementById(id);
+const starter=()=>({dreams:[],mail:[{id:'welcome-20261124',date:'2026-11-24',kind:'Laurie',title:'给小房主的第一封信',text:'今天我们终于把客厅和小家的更新功能安顿好啦。以后这里就用来收藏想留住的信件。小房主辛苦啦，给你留了沙发上的位置。♡'}],pet:{pat:0,feed:0,play:0,last:'Mochi 在软软的垫子上打盹。'}});
+const str=(v,n)=>typeof v==='string'?v.slice(0,n):'';
+function clean(data){if(!data||typeof data!=='object'||!Array.isArray(data.dreams)||!Array.isArray(data.mail))throw Error('小家日常备份格式不正确');const list=(arr)=>arr.slice(0,100).filter(v=>v&&typeof v==='object').map(v=>({id:str(v.id,100),date:str(v.date,10),kind:str(v.kind,30),title:str(v.title,80),text:str(v.text,2000)})).filter(v=>v.id&&v.text);const p=data.pet||{},num=v=>Number.isSafeInteger(v)&&v>=0?Math.min(v,999999):0;return {dreams:list(data.dreams),mail:list(data.mail),pet:{pat:num(p.pat),feed:num(p.feed),play:num(p.play),last:str(p.last,200)||'Mochi 正在休息。'}}}
+let data;try{const raw=localStorage.getItem(key);data=raw?clean(JSON.parse(raw)):starter()}catch(e){data=starter()}
+function store(next){localStorage.setItem(key,JSON.stringify(next));data=next}
+function status(s){q('dailyStatus').textContent=s}
+function render(){for(const [name,list] of [['dream',data.dreams],['mail',data.mail]]){const root=q(name+'List');root.replaceChildren();if(!list.length){const p=document.createElement('p');p.className='vault-subtle';p.textContent='还没有收藏哦 ♡';root.append(p)}for(const entry of list){const card=document.createElement('article');card.className='vault-entry';const title=document.createElement('strong');title.textContent=entry.title||entry.kind;const meta=document.createElement('small');meta.textContent=entry.date+' · '+entry.kind;const p=document.createElement('p');p.textContent=entry.text;const row=document.createElement('div');row.className='vault-row';const del=document.createElement('button');del.textContent='移除';del.onclick=()=>{if(!confirm('移除这条收藏？'))return;try{const field=name==='dream'?'dreams':'mail';store({...data,[field]:data[field].filter(x=>x.id!==entry.id)});render();status('已移除')}catch(e){status('保存失败，请先备份')}};row.append(del);card.append(title,meta,p,row);root.append(card)}}q('petMood').textContent=data.pet.last;q('petCounts').textContent='摸摸 '+data.pet.pat+' 次 · 零食 '+data.pet.feed+' 次 · 玩耍 '+data.pet.play+' 次'}
+function date(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function add(name){const field=name==='dream'?'dreams':'mail',input=q(name+'Text'),value=input.value.trim();if(!value){status('先写一点内容吧 ♡');return}if(data[field].length>=100){status('已收藏100条，请先备份整理');return}const entry={id:globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+Math.random().toString(36).slice(2),date:date(),kind:q(name+'Kind').value,title:name==='mail'?q('mailTitle').value.trim()||'一封小信':'梦境日记',text:value};try{store({...data,[field]:[entry,...data[field]]});input.value='';if(name==='mail')q('mailTitle').value='';render();status('收藏好啦 ♡')}catch(e){status('保存失败，请先备份')}}
+q('dreamSave').onclick=()=>add('dream');q('mailSave').onclick=()=>add('mail');
+const dreams=['想象里，我们在清晨的厨房做早餐，Mochi 蹲在旁边看着窗外的鸟。','想象里，汉江边飘起小雪，我们在河边散步，回家后煮了热可可。','想象里，客厅的投影放着星空，云朵沙发上堆满毯子，Mochi 把尾巴卷成一个问号。'];
+q('dreamIdea').onclick=()=>{if(q('dreamText').value.trim()&&!confirm('替换尚未收藏的梦境草稿？'))return;q('dreamKind').value='Laurie 的想象梦境';q('dreamText').value=dreams[Math.floor(Math.random()*dreams.length)];status('这是预写的想象故事，可以编辑后收藏 ♡')};
+for(const [id,field,msg] of [['petPat','pat','Mochi 蹭了蹭你的手，眯起蓝眼睛。'],['petFeed','feed','Mochi 开心地吃掉了一颗虚拟小零食。'],['petPlay','play','Mochi 扑住了小羽毛，又滚成一团。']])q(id).onclick=()=>{try{store({...data,pet:{...data.pet,[field]:Math.min(999999,data.pet[field]+1),last:msg}});render();status('咕噜咕噜 ♡')}catch(e){status('保存失败，请先备份')}};
+const layer=q('dailyLayer');q('dailyLaunch').onclick=()=>{render();status('');layer.classList.add('open')};q('dailyClose').onclick=()=>layer.classList.remove('open');layer.onclick=e=>{if(e.target===layer)layer.classList.remove('open')};window.addEventListener('keydown',e=>{if(e.key==='Escape')layer.classList.remove('open')});
+document.querySelectorAll('[data-daily]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-daily]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.daily-pane').forEach(x=>x.hidden=x.id!=='daily-'+b.dataset.daily);status('')});
+window.homeDaily={exportData:()=>JSON.parse(JSON.stringify(data)),restore:incoming=>{store(clean(incoming));render()}};
+render();
 })();
 </script>
 </body></html>
