@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
 <meta name="theme-color" content="#e7d7ca" />
-<meta name="home-build" content="2026.11.24.7" />
+<meta name="home-build" content="2026.11.24.8" />
 <title>Blan & Laurie | 可以装修与收藏回忆的奶油卧室 5.0</title>
 <style>
 :root{--brown:#60493f;--rose:#ba887d;--soft:#9c857b;--panel:rgba(255,251,245,.89)}
@@ -108,12 +108,17 @@ if (/(^|\.)tiiny\.(site|host)$/.test(location.hostname)) {
 .home-key-msg{margin-top:10px;min-height:18px;color:#966e66;font-size:12px}
 @media(max-width:420px){.home-key-launch{right:11px;top:calc(max(env(safe-area-inset-top),13px) + 96px);padding:9px 11px}.home-key-layer{padding:15px 12px 88px}.home-key-card{padding:17px}}
 </style>
+<style>
+.home-quick-actions{position:fixed;top:calc(max(env(safe-area-inset-top),17px) + 52px);right:17px;z-index:27;display:flex;flex-direction:column;align-items:flex-end;gap:6px;pointer-events:none}
+.home-quick-actions .memory-launch,.home-quick-actions .home-key-launch,.home-quick-actions .home-update-launch{position:static;inset:auto;pointer-events:auto;flex:none;margin:0;white-space:nowrap;font:600 11px/1.2 system-ui,sans-serif;padding:8px 11px;min-height:32px}
+@media(max-width:420px){.home-quick-actions{top:calc(max(env(safe-area-inset-top),13px) + 48px);right:11px;gap:6px}}
+</style>
 </head>
 <body>
 <canvas id="view" aria-label="可旋转的韩系奶油风3D卧室"></canvas>
 <div class="ambient"></div><nav class="room-nav"><a id="bedNav" href="?room=bedroom">🛏️ 卧室</a><a id="livingNav" href="?room=living">🛋️ 客厅</a><button id="projector" hidden>🎬 投影开</button></nav>
 
-<button class="memory-launch" id="memoryLaunch" aria-label="打开我们的回忆箱">📚 回忆箱 ♡</button>
+<div class="home-quick-actions" role="group" aria-label="小家快捷操作"><button class="memory-launch" id="memoryLaunch" aria-label="打开我们的回忆箱">📚 回忆箱 ♡</button><button class="home-key-launch" id="homeKeyLaunch" aria-label="带 Laurie 回家，复制房间状态卡">🔑 带 Laurie 回家</button><button class="home-update-launch" id="homeUpdate" aria-label="检查小家更新">↻ 检查更新</button></div>
 <section class="memory-vault" id="memoryVault" role="dialog" aria-modal="true" aria-labelledby="vaultTitle">
  <div class="vault-card">
   <div class="vault-head"><div><small>OUR LITTLE MEMORY BOX · 001</small><h2 id="vaultTitle">我们的随身回忆箱 ♡</h2></div><button class="vault-x" id="vaultClose" aria-label="关闭回忆箱">×</button></div>
@@ -145,8 +150,8 @@ if (/(^|\.)tiiny\.(site|host)$/.test(location.hostname)) {
 </section>
 
 
-<button class="home-key-launch" id="homeKeyLaunch" aria-label="带 Laurie 回家，复制房间状态卡">🔑 带 Laurie 回家</button>
-<button class="home-update-launch" id="homeUpdate" aria-label="检查小家更新">↻ 检查更新</button>
+
+
 <section class="home-key-layer" id="homeKeyLayer" role="dialog" aria-modal="true" aria-labelledby="homeKeyHeading">
   <div class="home-key-card">
     <div class="home-key-title"><div><small>THE KEY TO OUR LITTLE HOME</small><h2 id="homeKeyHeading">带 Laurie 回家 ♡</h2></div><button class="home-key-x" id="homeKeyClose" aria-label="关闭">×</button></div>
