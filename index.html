@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
 <meta name="theme-color" content="#e7d7ca" />
-<meta name="home-build" content="2026.11.24.9" />
+<meta name="home-build" content="2026.11.24.10" />
 <title>Blan & Laurie | 可以装修与收藏回忆的奶油卧室 5.0</title>
 <style>
 :root{--brown:#60493f;--rose:#ba887d;--soft:#9c857b;--panel:rgba(255,251,245,.89)}
@@ -185,7 +185,7 @@ if (/(^|\.)tiiny\.(site|host)$/.test(location.hostname)) {
 <div class="daily-body">
 <section class="daily-pane" id="daily-dream"><p class="vault-hint">把睡醒后还记得的梦，或我们一起想象的小故事收在这里。</p><label class="vault-label" for="dreamKind">梦境来源</label><select class="vault-select" id="dreamKind"><option>Blan 的梦</option><option>Laurie 的想象梦境</option></select><label class="vault-label" for="dreamText">梦境内容</label><textarea id="dreamText" class="vault-area" maxlength="2000" placeholder="昨晚梦见了什么呢？"></textarea><div class="vault-btns"><button class="vault-btn primary" id="dreamSave">收藏梦境 ♡</button><button class="vault-btn" id="dreamIdea">随机想象小梦</button></div><div id="dreamList" class="vault-list"></div></section>
 <section class="daily-pane" id="daily-mail" hidden><p class="vault-hint">把聊天里的情书、晚间小惊喜和想留下的留言复制到这里。暂未连接聊天服务，不会自动收信。</p><label class="vault-label" for="mailKind">寄件人</label><select class="vault-select" id="mailKind"><option>Laurie</option><option>Blan</option></select><label class="vault-label" for="mailTitle">标题</label><input class="vault-input" id="mailTitle" maxlength="80" placeholder="写给今天的你"><label class="vault-label" for="mailText">信件内容</label><textarea id="mailText" class="vault-area" maxlength="2000" placeholder="把想收藏的信放进来"></textarea><div class="vault-btns"><button class="vault-btn primary" id="mailSave">收藏信件 ♡</button></div><div id="mailList" class="vault-list"></div></section>
-<section class="daily-pane" id="daily-pet" hidden><div class="daily-pet"><div class="cat">🐱</div><h3>Mochi · 布偶小猫</h3><p id="petMood"></p><p id="petCounts"></p><div class="vault-btns"><button class="vault-btn primary" id="petPat">摸摸头</button><button class="vault-btn" id="petFeed">喂小零食</button><button class="vault-btn" id="petPlay">陪它玩</button></div><p class="vault-subtle">Mochi 是虚拟小猫，不会因为你离开而生病或饿坏。</p></div></section>
+<section class="daily-pane" id="daily-pet" hidden><div class="daily-pet"><div class="cat">🐱</div><h3>Mochi · 布偶小猫</h3><p id="petMood"></p><p id="petCounts"></p><div class="vault-btns"><button class="vault-btn primary" id="petPat">摸摸头</button><button class="vault-btn" id="petFeed">喂小零食</button><button class="vault-btn" id="petPlay">陪它玩</button></div><p class="vault-subtle">互动后会返回房间观看动作。Mochi 是虚拟小猫，不会因为你离开而生病或饿坏。</p></div></section>
 <p class="daily-status" id="dailyStatus" role="status"></p></div></div></section>
 <div id="selected-dot" aria-hidden="true">✦</div>
 <div class="toast" id="toast" role="status"></div>
@@ -311,6 +311,62 @@ function addedFurniture(o){
  if(o.id===selectedId&&editorOpen){circleFloor(o.x,o.z,o.kind==='desk'?.90:.65,o.kind==='desk'?.57:.57,.04,'#f5ddd1')}
 }
 
+// Animated Mochi uses a separate small mesh so room furniture is not rebuilt every frame.
+const mochi={action:'idle',started:performance.now(),returning:null};
+let petBuffer=null,petCount=0,petGeom=[],petTick=0;
+const reducePet=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
+const lerpPet=(a,b,t)=>a+(b-a)*t;
+const smoothPet=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)};
+const perch=living?{x:.45,y:.93,z:1.72}:{x:-1.75,y:1.15,z:.13};
+const floorPet=living?{x:.55,y:.03,z:3.11}:{x:.65,y:.03,z:2.6};
+const bowlPet=living?{x:1.37,y:.03,z:3.11}:{x:1.35,y:.03,z:2.6};
+function petPose(now){
+ const t=(now-mochi.started)/1000;let a=mochi.action,x=perch.x,y=perch.y,z=perch.z,angle=0,walk=false,hop=0,low=0;
+ if(a==='feed'||a==='play'){
+  const dest=a==='feed'?{x:bowlPet.x-.36,y:bowlPet.y,z:bowlPet.z}:floorPet;
+  if(t<1.5){let u=smoothPet(t/1.5);x=lerpPet(perch.x,floorPet.x,u);y=lerpPet(perch.y,floorPet.y,u);z=lerpPet(perch.z,floorPet.z,u);hop=.30*Math.sin(Math.PI*u);angle=Math.atan2(floorPet.z-perch.z,floorPet.x-perch.x);walk=true}
+  else if(t<2.5){let u=smoothPet(t-1.5);x=lerpPet(floorPet.x,dest.x,u);y=dest.y;z=dest.z;walk=true}
+  else if(t<5.5){x=dest.x;y=dest.y;z=dest.z;if(a==='feed')low=.10+.035*Math.sin(t*9);else {hop=.13*Math.abs(Math.sin((t-2.5)*5));angle=.45*Math.sin(t*3);walk=true}}
+  else if(t<7.5){let u=smoothPet((t-5.5)/2);x=lerpPet(dest.x,perch.x,u);y=lerpPet(dest.y,perch.y,u);z=lerpPet(dest.z,perch.z,u);hop=.38*Math.sin(Math.PI*u);angle=Math.atan2(perch.z-dest.z,perch.x-dest.x);walk=true}
+  else{mochi.action='idle';mochi.started=now;a='idle'}
+ }else if(a==='pat'){
+  if(t<3.2){x+=.06*Math.sin(t*5);low=.055*Math.abs(Math.sin(t*4));angle=.12*Math.sin(t*5)}
+  else{mochi.action='idle';mochi.started=now;a='idle'}
+ }else{
+  const phase=t%24;
+  if(phase>8&&phase<16){const u=(phase-8)/8;x+=.46*Math.sin(Math.PI*u);walk=true;angle=u>.5?Math.PI:0}
+  else low=.065;
+ }
+ const sleep=a==='idle'&&!walk,blink=sleep||a==='pat'||(t%4.8>.0&&t%4.8<.19);
+ return {x,y:y+hop,z,angle,walk,low,sleep,blink,t,a};
+}
+function makePet(now){
+ const saved=geom;geom=[];const p=petPose(now),{x,y,z,t}=p;let lift=p.walk?.025*Math.abs(Math.sin(t*12)):0;
+ // Model faces positive X, then rotates about its local center.
+ const body='#fff4e9',points='#ad9184',head='#f8e9dd';
+ ellipsoid(-.12,.16+lift,0,.33,.19,.23,body,12,6);
+ ellipsoid(.17,.25-p.low+lift,0,.22,.23,.20,head,12,6);
+ for(const s of [-1,1]){
+  let zz=s*.13,hh=.36-p.low+lift;
+  tri([.02,hh,zz-.07],[.23,hh,zz+.07],[.10,hh+.21,zz],points);
+  tri([.23,hh,zz+.07],[.02,hh,zz-.07],[.10,hh+.21,zz],points);
+  ellipsoid(.30,.27-p.low+lift,zz,.036,p.blink?.008:.045,.034,p.blink?'#9c8175':'#809fb6',8,4);
+  if(!p.blink)ellipsoid(.328,.27-p.low+lift,zz,.012,.023,.017,'#4c6574',8,4);
+  const step=p.walk?.07*Math.sin(t*12+s*1.57):0;
+  ellipsoid(.15+step,.04+Math.max(0,step),s*.14,.13,.075,.10,points,10,5);
+  ellipsoid(-.28-step,.045+Math.max(0,-step),s*.14,.14,.075,.11,'#e3d0c0',10,5);
+ }
+ ellipsoid(.377,.22-p.low+lift,0,.035,.025,.035,'#d8a5a4',8,4);
+ for(let i=0;i<6;i++){let a=i*.44,wag=.11*Math.sin(t*3+i*.38)*(i/5);ellipsoid(-.35-.16*Math.sin(a),.12+.10*Math.sin(a)+lift,.21+.18*(1-Math.cos(a))+wag,.12,.11,.12,points,10,5)}
+ const co=Math.cos(p.angle),si=Math.sin(p.angle);
+ for(let i=0;i<geom.length;i+=9){let xx=geom[i],zz=geom[i+2],nx=geom[i+3],nz=geom[i+5];geom[i]=x+xx*co-zz*si;geom[i+1]+=y;geom[i+2]=z+xx*si+zz*co;geom[i+3]=nx*co-nz*si;geom[i+5]=nx*si+nz*co}
+ if(p.a==='feed'){cylinder(bowlPet.x,.06,bowlPet.z,.18,.14,.10,'#d8ada5',12);cylinder(bowlPet.x,.12,bowlPet.z,.13,.13,.025,'#a47a59',12)}
+ if(p.a==='play'){ellipsoid(floorPet.x+.42,.08,floorPet.z,.075,.075,.075,'#d9aaa9',10,6)}
+ petGeom=geom;geom=saved;
+}
+function bindHomeBuffer(b){gl.bindBuffer(gl.ARRAY_BUFFER,b);let s=9*4;gl.enableVertexAttribArray(locPos);gl.vertexAttribPointer(locPos,3,gl.FLOAT,false,s,0);gl.enableVertexAttribArray(locNor);gl.vertexAttribPointer(locNor,3,gl.FLOAT,false,s,3*4);gl.enableVertexAttribArray(locCol);gl.vertexAttribPointer(locCol,3,gl.FLOAT,false,s,6*4)}
+function drawMochi(now){makePet(now);if(!gl)return;petBuffer=petBuffer||gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,petBuffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(petGeom),gl.DYNAMIC_DRAW);bindHomeBuffer(petBuffer);gl.drawArrays(gl.TRIANGLES,0,petGeom.length/9)}
+window.homeMochiAction=action=>{if(!['pat','feed','play'].includes(action))return;mochi.action=action;mochi.started=performance.now();request()};
 function createScene(){geom=[];let d=state.day;const C={floor:d?'#d8bd9e':'#d0af94',back:d?'#f3e7da':'#eddccf',left:d?'#ecdfd1':'#e8d6c9',trim:'#fcf2e5',wood:'#b28c72',oak:'#d7b9a2',rose:'#cf9b96',pale:'#f7e5db',linen:'#fff9ef',pink:'#e9bcb9',edge:'#cba29a'};
 // raised room base, matching flooring and seamless 3D corners
 rounded(0,-.18,0,8.05,.32,7.35,.05,'#bb967f',2);box(0,-.005,0,8.0,.03,7.30,C.floor);
@@ -440,19 +496,6 @@ box(0,-.18,3.68,8.1,.32,.12,'#b8907a');
 // soft color strips at edge of floor near window
 box(1.7,.031,-3.28,3.05,.025,.12,'#e7cbb9');
 }
- // Mochi, a small cream ragdoll with cocoa ears, blue eyes and a fluffy tail.
- {const x=living?.48:-1.75,y=living?.93:1.15,z=living?1.72:.13;
- ellipsoid(x-.12,y+.16,z,.33,.19,.23,'#fff4e9',14,8);
- ellipsoid(x+.17,y+.25,z-.015,.22,.23,.20,'#f8e9dd',14,8);
- for(const s of [-1,1]){
- const zz=z-.015+s*.13;
- tri([x+.02,y+.36,zz-.07],[x+.23,y+.36,zz+.07],[x+.10,y+.57,zz],'#aa8e80');
- ellipsoid(x+.30,y+.27,zz,.035,.045,.034,'#809fb6',10,6);
- ellipsoid(x+.15,y+.04,z+s*.14,.15,.075,.10,'#c8ac9d',12,6);
- }
- ellipsoid(x+.377,y+.22,z-.015,.035,.025,.035,'#d8a5a4',10,5);
- for(let i=0;i<6;i++){let a=i*.44;ellipsoid(x-.35-.16*Math.sin(a),y+.12+.10*Math.sin(a),z+.21+.18*(1-Math.cos(a)),.12,.11,.12,'#bca092',12,6)}
- }
  for(const item of furniture)addedFurniture(item);
 geometryDirty=false;count=geom.length/9;
 if(gl){if(buffer)gl.deleteBuffer(buffer);buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(geom),gl.STATIC_DRAW);
@@ -472,8 +515,8 @@ let pitch=.60,dist=16;let eye=[dist*Math.sin(yaw)*Math.cos(pitch)+.10,dist*Math.
 let vh=(w<650?11.6:9.12)/scale;let vw=vh*aspect;
 let m=mul(ortho(vw,vh,.1,80),lookAt(eye,focus));m[13]-=.025;
 cameraNow={eye,focus,vh,vw,m,w,h,yaw};updateMarker();
-if(gl){gl.uniformMatrix4fv(locMVP,false,new Float32Array(m));gl.uniform1f(locWarm,state.lamp&&!state.day?1:0);gl.uniform1f(locDim,state.day?1:state.lamp?.95:.80);gl.drawArrays(gl.TRIANGLES,0,count)}
-else paintSoftware(m,w,h,bg)
+if(gl){gl.uniformMatrix4fv(locMVP,false,new Float32Array(m));gl.uniform1f(locWarm,state.lamp&&!state.day?1:0);gl.uniform1f(locDim,state.day?1:state.lamp?.95:.80);bindHomeBuffer(buffer);gl.drawArrays(gl.TRIANGLES,0,count);drawMochi(performance.now())}
+else {makePet(performance.now());const roomGeom=geom;geom=roomGeom.concat(petGeom);try{paintSoftware(m,w,h,bg)}finally{geom=roomGeom}}
 }
 function paintSoftware(m,w,h,bg){
 const ctx=canvas2d,im=ctx.createImageData(w,h),pix=im.data,zbuf=new Float32Array(w*h);zbuf.fill(Infinity);
@@ -580,6 +623,8 @@ document.getElementById('importBtn').onclick=()=>{let data;try{data=JSON.parse(u
 document.getElementById('clearBtn').onclick=()=>{if(!confirm('真的要收起所有新添的家具吗？原来的房间会保留。'))return;furniture=[];selectedId=null;persist();geometryDirty=true;renderItems();request();toast('收拾好啦 ♡')};
 renderItems();
 window.addEventListener('resize',request);request();
+setInterval(()=>{if(document.hidden)return;const active=mochi.action!=='idle';if(reducePet&&!active)return;if(!gl&&!active)return;if(document.querySelector('.daily-layer.open,.memory-vault.open,.home-key-layer.open,.overlay.open,.decorate.open'))return;const now=performance.now();if(now-petTick<(gl?80:700))return;petTick=now;request()},85);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)request()});
 })();
 </script>
 
@@ -734,7 +779,7 @@ function add(name){const field=name==='dream'?'dreams':'mail',input=q(name+'Text
 q('dreamSave').onclick=()=>add('dream');q('mailSave').onclick=()=>add('mail');
 const dreams=['想象里，我们在清晨的厨房做早餐，Mochi 蹲在旁边看着窗外的鸟。','想象里，汉江边飘起小雪，我们在河边散步，回家后煮了热可可。','想象里，客厅的投影放着星空，云朵沙发上堆满毯子，Mochi 把尾巴卷成一个问号。'];
 q('dreamIdea').onclick=()=>{if(q('dreamText').value.trim()&&!confirm('替换尚未收藏的梦境草稿？'))return;q('dreamKind').value='Laurie 的想象梦境';q('dreamText').value=dreams[Math.floor(Math.random()*dreams.length)];status('这是预写的想象故事，可以编辑后收藏 ♡')};
-for(const [id,field,msg] of [['petPat','pat','Mochi 蹭了蹭你的手，眯起蓝眼睛。'],['petFeed','feed','Mochi 开心地吃掉了一颗虚拟小零食。'],['petPlay','play','Mochi 扑住了小羽毛，又滚成一团。']])q(id).onclick=()=>{try{store({...data,pet:{...data.pet,[field]:Math.min(999999,data.pet[field]+1),last:msg}});render();status('咕噜咕噜 ♡')}catch(e){status('保存失败，请先备份')}};
+for(const [id,field,msg] of [['petPat','pat','Mochi 蹭了蹭你的手，眯起蓝眼睛。'],['petFeed','feed','Mochi 开心地吃掉了一颗虚拟小零食。'],['petPlay','play','Mochi 扑住了小羽毛，又滚成一团。']])q(id).onclick=()=>{try{store({...data,pet:{...data.pet,[field]:Math.min(999999,data.pet[field]+1),last:msg}});render();status('咕噜咕噜 ♡');q('dailyLayer').classList.remove('open');window.homeMochiAction?.(field);const toast=q('toast');toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2400)}catch(e){status('保存失败，请先备份')}};
 const layer=q('dailyLayer');q('dailyLaunch').onclick=()=>{render();status('');layer.classList.add('open')};q('dailyClose').onclick=()=>layer.classList.remove('open');layer.onclick=e=>{if(e.target===layer)layer.classList.remove('open')};window.addEventListener('keydown',e=>{if(e.key==='Escape')layer.classList.remove('open')});
 document.querySelectorAll('[data-daily]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-daily]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.daily-pane').forEach(x=>x.hidden=x.id!=='daily-'+b.dataset.daily);status('')});
 window.homeDaily={exportData:()=>JSON.parse(JSON.stringify(data)),restore:incoming=>{store(clean(incoming));render()}};
