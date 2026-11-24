@@ -317,31 +317,62 @@ let petBuffer=null,petCount=0,petGeom=[],petTick=0;
 const reducePet=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
 const lerpPet=(a,b,t)=>a+(b-a)*t;
 const smoothPet=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)};
-const perch=living?{x:.45,y:.93,z:1.72}:{x:-1.75,y:1.15,z:.13};
-const floorPet=living?{x:.55,y:.03,z:3.11}:{x:.65,y:.03,z:2.6};
-const bowlPet=living?{x:1.37,y:.03,z:3.11}:{x:1.35,y:.03,z:2.6};
+// Floor-only navigation with collision clearance for Mochi's body and tail.
+const PET_SCALE=.73,PET_R=.56,STEP=.16,NX=43,NZ=40;
+const fixed=living?[
+[-.78,2.02,4.38,1.63],[-2.42,1.02,1.24,2.88],[-.78,2.62,4.35,.43],[-2.99,1.95,.28,1.63],[1.4,2.02,.27,1.46],[-1.68,-2.99,3.32,.84],[-.23,-.27,1.85,1.15],[-3.54,-1.72,.72,1.50],[3.02,-1.75,1.28,.75],[2.54,1.95,.66,.66],[2.42,.48,1.26,1.22],[3.23,-2.75,.70,.70]
+]:[
+[-1.12,-.60,3.20,3.46],[-1.12,-2.34,3.20,.37],[-1.13,1.70,2.18,.70],[-3.06,-2,.89,.87],[.85,-2,.89,.87],[3.46,-2.93,.48,.25],[2.38,1.66,1.91,1.66],[2.64,-.33,1,1],[3.25,2.54,.70,.70]
+];
+const footprints={plant:[.74,.74],lamp:[.76,.76],stool:[.95,.72],table:[1.18,1.18],books:[.87,.66],flowers:[.75,.68],cabinet:[1.53,.76],basket:[.84,.84],bear:[.80,.75],mirror:[1.15,.65],desk:[1.57,.80]};
+const homeHint=living?{x:1.08,z:-1.72}:{x:.72,z:2.62};
+const feedHint=living?{x:1.53,z:-1.6}:{x:.72,z:1.32};
+const playHint=living?{x:-1.35,z:-1.72}:{x:-.60,z:2.80};
+let petHome=null,petMap=null,petSig='',petPlan=null,petQueue=null;
+const petDist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
+function obstacles(){const obs=fixed.map(([x,z,w,d])=>({x,z,w,d,r:0}));for(const o of furniture){const f=footprints[o.kind];if(f)obs.push({x:o.x,z:o.z,w:f[0],d:f[1],r:o.r||0})}return obs}
+function clearPet(p,obs,r=PET_R){
+ if(p.x<-3.88+r||p.x>4-r||p.z<-3.48+r||p.z>3.65-r)return false;
+ return !obs.some(o=>{const dx=p.x-o.x,dz=p.z-o.z,co=Math.cos(o.r),si=Math.sin(o.r);return Math.hypot(Math.max(0,Math.abs(dx*co-dz*si)-o.w/2),Math.max(0,Math.abs(dx*si+dz*co)-o.d/2))<r+.02});
+}
+function linePet(a,b,obs){const n=Math.max(1,Math.ceil(petDist(a,b)/.04));for(let i=0;i<=n;i++){const u=i/n;if(!clearPet({x:lerpPet(a.x,b.x,u),z:lerpPet(a.z,b.z,u)},obs))return false}return true}
+function nearestPet(hint,allow){let best=null,d=Infinity;for(const p of petMap.points){if(!petMap.free[p.i]||(allow&&!allow(p)))continue;const n=petDist(p,hint);if(n<d){d=n;best=p}}return best}
+function refreshPet(now){
+ const sig=JSON.stringify(furniture.map(o=>[o.kind,o.x,o.z,o.r]));
+ if(petMap&&sig===petSig)return;
+ petSig=sig;const obs=obstacles(),points=Array.from({length:NX*NZ},(_,i)=>({x:-3.32+(i%NX)*STEP,z:-3.04+Math.floor(i/NX)*STEP,i}));
+ petMap={obs,points,free:points.map(p=>clearPet(p,obs))};petHome=nearestPet(petHome||homeHint);
+ petPlan=null;petQueue=null;mochi.action='idle';mochi.started=now;
+}
+function petProp(p,hint){let best=null,d=Infinity;for(let i=0;i<16;i++){const a=i*Math.PI/8,q={x:p.x+.46*Math.cos(a),z:p.z+.46*Math.sin(a),angle:a};if(clearPet(q,petMap.obs,.19)&&petDist(q,hint)<d){best=q;d=petDist(q,hint)}}return best}
+function startPet(action,now){
+ if(!petHome)return;mochi.action=action;mochi.started=now;petPlan=null;if(action==='pat')return;
+ const {points,free,obs}=petMap,parents=new Int32Array(points.length);parents.fill(-2);parents[petHome.i]=-1;
+ const queue=[petHome.i];for(let h=0;h<queue.length;h++){const i=queue[h],x=i%NX,z=Math.floor(i/NX);for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){const xx=x+dx,zz=z+dz;if(xx<0||xx>=NX||zz<0||zz>=NZ)continue;const j=zz*NX+xx;if(parents[j]!==-2||!free[j]||!linePet(points[i],points[j],obs))continue;parents[j]=i;queue.push(j)}}
+ const hint=action==='feed'?feedHint:playHint,dest=nearestPet(hint,p=>parents[p.i]!==-2&&!!petProp(p,hint))||petHome;
+ const raw=[];for(let i=dest.i;i>=0;i=parents[i])raw.push(points[i]);raw.reverse();
+ const path=[raw[0]];for(let i=0;i<raw.length-1;){let j=raw.length-1;while(j>i+1&&!linePet(raw[i],raw[j],obs))j--;path.push(raw[j]);i=j}
+ const length=path.slice(1).reduce((s,p,i)=>s+petDist(p,path[i]),0);
+ petPlan={path,length,duration:Math.max(.5,length/.82),dest,prop:petProp(dest,hint)};
+}
+function alongPet(path,u,len){if(path.length===1||len===0)return {...path[0],angle:0};let left=Math.max(0,Math.min(1,u))*len;for(let i=1;i<path.length;i++){const a=path[i-1],b=path[i],d=petDist(a,b);if(left<=d||i===path.length-1){const f=Math.min(1,left/(d||1));return {x:lerpPet(a.x,b.x,f),z:lerpPet(a.z,b.z,f),angle:Math.atan2(b.z-a.z,b.x-a.x)}}left-=d}return {...path[0],angle:0}}
+function petSurface(p){let y=.035;const clamp=v=>Math.max(0,Math.min(1,v));if(living){const v=Math.hypot((p.x+.54)/2.12,(p.z+.29)/1.43);y+=.15*clamp((1.14-v)/.2)}else{const v=Math.max(Math.abs(p.x+.4)/2.63,Math.abs(p.z-.35)/2.41);y+=.08*clamp((1.06-v)/.14)}for(const o of furniture)if(o.kind==='rug'){const dx=p.x-o.x,dz=p.z-o.z,co=Math.cos(o.r),si=Math.sin(o.r),v=Math.hypot((dx*co-dz*si)/.85,(dx*si+dz*co)/.66);y=Math.max(y,.035+.14*clamp((1.05-v)/.2))}return y}
 function petPose(now){
- const t=(now-mochi.started)/1000;let a=mochi.action,x=perch.x,y=perch.y,z=perch.z,angle=0,walk=false,hop=0,low=0;
+ refreshPet(now);if(!petHome)return null;
+ let t=(now-mochi.started)/1000,a=mochi.action,p=petHome,angle=0,walk=false,hop=0,low=.065;
  if(a==='feed'||a==='play'){
-  const dest=a==='feed'?{x:bowlPet.x-.36,y:bowlPet.y,z:bowlPet.z}:floorPet;
-  if(t<1.5){let u=smoothPet(t/1.5);x=lerpPet(perch.x,floorPet.x,u);y=lerpPet(perch.y,floorPet.y,u);z=lerpPet(perch.z,floorPet.z,u);hop=.30*Math.sin(Math.PI*u);angle=Math.atan2(floorPet.z-perch.z,floorPet.x-perch.x);walk=true}
-  else if(t<2.5){let u=smoothPet(t-1.5);x=lerpPet(floorPet.x,dest.x,u);y=dest.y;z=dest.z;walk=true}
-  else if(t<5.5){x=dest.x;y=dest.y;z=dest.z;if(a==='feed')low=.10+.035*Math.sin(t*9);else {hop=.13*Math.abs(Math.sin((t-2.5)*5));angle=.45*Math.sin(t*3);walk=true}}
-  else if(t<7.5){let u=smoothPet((t-5.5)/2);x=lerpPet(dest.x,perch.x,u);y=lerpPet(dest.y,perch.y,u);z=lerpPet(dest.z,perch.z,u);hop=.38*Math.sin(Math.PI*u);angle=Math.atan2(perch.z-dest.z,perch.x-dest.x);walk=true}
-  else{mochi.action='idle';mochi.started=now;a='idle'}
- }else if(a==='pat'){
-  if(t<3.2){x+=.06*Math.sin(t*5);low=.055*Math.abs(Math.sin(t*4));angle=.12*Math.sin(t*5)}
-  else{mochi.action='idle';mochi.started=now;a='idle'}
- }else{
-  const phase=t%24;
-  if(phase>8&&phase<16){const u=(phase-8)/8;x+=.46*Math.sin(Math.PI*u);walk=true;angle=u>.5?Math.PI:0}
-  else low=.065;
- }
- const sleep=a==='idle'&&!walk,blink=sleep||a==='pat'||(t%4.8>.0&&t%4.8<.19);
- return {x,y:y+hop,z,angle,walk,low,sleep,blink,t,a};
+ const plan=petPlan,run=plan?.duration||.5;
+ if(plan&&t<run){p=alongPet(plan.path,t/run,plan.length);angle=p.angle;walk=plan.length>.02;low=0}
+ else if(plan&&t<run+3){p=plan.dest;angle=plan.prop?.angle||0;low=a==='feed'?.09+.025*Math.sin(t*9):.015;if(a==='play')hop=.11*Math.abs(Math.sin((t-run)*5))}
+ else if(plan&&t<run*2+3){p=alongPet(plan.path,1-(t-run-3)/run,plan.length);angle=p.angle+Math.PI;walk=plan.length>.02;low=0}
+ else{mochi.action='idle';mochi.started=now;petPlan=null;a='idle'}
+ }else if(a==='pat'){if(t<3.2){low=.04+.035*Math.abs(Math.sin(t*4));angle=.16*Math.sin(t*5)}else{mochi.action='idle';mochi.started=now;a='idle'}}else angle=.12*Math.sin(t*.6);
+ if(a==='idle'&&petQueue){const next=petQueue;petQueue=null;startPet(next,now);return petPose(now)}
+ const sleep=a==='idle',blink=sleep||a==='pat'||(t%4.8<.19);
+ return {x:p.x,y:petSurface(p)+hop,z:p.z,angle,walk,low,sleep,blink,t,a,prop:petPlan?.prop||null};
 }
 function makePet(now){
- const saved=geom;geom=[];const p=petPose(now),{x,y,z,t}=p;let lift=p.walk?.025*Math.abs(Math.sin(t*12)):0;
+ const saved=geom;geom=[];const p=petPose(now);if(!p){petGeom=[];geom=saved;return}const {x,y,z,t}=p;let lift=p.walk?.025*Math.abs(Math.sin(t*12)):0;
  // Model faces positive X, then rotates about its local center.
  const body='#fff4e9',points='#ad9184',head='#f8e9dd';
  ellipsoid(-.12,.16+lift,0,.33,.19,.23,body,12,6);
@@ -359,14 +390,14 @@ function makePet(now){
  ellipsoid(.377,.22-p.low+lift,0,.035,.025,.035,'#d8a5a4',8,4);
  for(let i=0;i<6;i++){let a=i*.44,wag=.11*Math.sin(t*3+i*.38)*(i/5);ellipsoid(-.35-.16*Math.sin(a),.12+.10*Math.sin(a)+lift,.21+.18*(1-Math.cos(a))+wag,.12,.11,.12,points,10,5)}
  const co=Math.cos(p.angle),si=Math.sin(p.angle);
- for(let i=0;i<geom.length;i+=9){let xx=geom[i],zz=geom[i+2],nx=geom[i+3],nz=geom[i+5];geom[i]=x+xx*co-zz*si;geom[i+1]+=y;geom[i+2]=z+xx*si+zz*co;geom[i+3]=nx*co-nz*si;geom[i+5]=nx*si+nz*co}
- if(p.a==='feed'){cylinder(bowlPet.x,.06,bowlPet.z,.18,.14,.10,'#d8ada5',12);cylinder(bowlPet.x,.12,bowlPet.z,.13,.13,.025,'#a47a59',12)}
- if(p.a==='play'){ellipsoid(floorPet.x+.42,.08,floorPet.z,.075,.075,.075,'#d9aaa9',10,6)}
+ for(let i=0;i<geom.length;i+=9){let xx=geom[i],zz=geom[i+2],nx=geom[i+3],nz=geom[i+5];geom[i]=x+PET_SCALE*(xx*co-zz*si);geom[i+1]=y+PET_SCALE*geom[i+1];geom[i+2]=z+PET_SCALE*(xx*si+zz*co);geom[i+3]=nx*co-nz*si;geom[i+5]=nx*si+nz*co}
+ if(p.a==='feed'&&p.prop){const q=p.prop,base=petSurface(q);cylinder(q.x,base+.05,q.z,.15,.12,.09,'#d8ada5',12);cylinder(q.x,base+.105,q.z,.11,.11,.025,'#a47a59',12)}
+ if(p.a==='play'&&p.prop){const q=p.prop;ellipsoid(q.x,petSurface(q)+.075,q.z,.075,.075,.075,'#d9aaa9',10,6)}
  petGeom=geom;geom=saved;
 }
 function bindHomeBuffer(b){gl.bindBuffer(gl.ARRAY_BUFFER,b);let s=9*4;gl.enableVertexAttribArray(locPos);gl.vertexAttribPointer(locPos,3,gl.FLOAT,false,s,0);gl.enableVertexAttribArray(locNor);gl.vertexAttribPointer(locNor,3,gl.FLOAT,false,s,3*4);gl.enableVertexAttribArray(locCol);gl.vertexAttribPointer(locCol,3,gl.FLOAT,false,s,6*4)}
 function drawMochi(now){makePet(now);if(!gl)return;petBuffer=petBuffer||gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,petBuffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(petGeom),gl.DYNAMIC_DRAW);bindHomeBuffer(petBuffer);gl.drawArrays(gl.TRIANGLES,0,petGeom.length/9)}
-window.homeMochiAction=action=>{if(!['pat','feed','play'].includes(action))return;mochi.action=action;mochi.started=performance.now();request()};
+window.homeMochiAction=action=>{if(!['pat','feed','play'].includes(action))return;const now=performance.now();refreshPet(now);if(mochi.action!=='idle')petQueue=action;else startPet(action,now);request()};
 function createScene(){geom=[];let d=state.day;const C={floor:d?'#d8bd9e':'#d0af94',back:d?'#f3e7da':'#eddccf',left:d?'#ecdfd1':'#e8d6c9',trim:'#fcf2e5',wood:'#b28c72',oak:'#d7b9a2',rose:'#cf9b96',pale:'#f7e5db',linen:'#fff9ef',pink:'#e9bcb9',edge:'#cba29a'};
 // raised room base, matching flooring and seamless 3D corners
 rounded(0,-.18,0,8.05,.32,7.35,.05,'#bb967f',2);box(0,-.005,0,8.0,.03,7.30,C.floor);
