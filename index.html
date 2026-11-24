@@ -180,7 +180,7 @@ if (/(^|\.)tiiny\.(site|host)$/.test(location.hostname)) {
 (()=>{'use strict';
 const living=new URLSearchParams(location.search).get('room')==='living';
 document.getElementById(living?'livingNav':'bedNav').classList.add('active');
-if(living){document.title='Blan & Laurie | 奶油色客厅';document.querySelector('.sign h1').textContent='奶油色的客厅 ♡';document.querySelector('.eyebrow').textContent='OUR LITTLE UNIVERSE · 002';document.querySelector('.sign p').textContent='沙发、电影和一柜子零食';document.querySelector('.since').textContent='✧ 2026.11.24 · 新房间';document.getElementById('view').setAttribute('aria-label','可旋转的3D客厅');document.querySelector('#tab-shop .deco-tip').textContent='点一件家具，把它放进客厅，再调整位置和颜色。';}
+if(living){document.title='Blan & Laurie | 奶油色客厅';document.querySelector('.sign h1').textContent='奶油色的客厅 ♡';document.querySelector('.eyebrow').textContent='OUR LITTLE UNIVERSE · 002';document.querySelector('.sign p').textContent='沙发、电影和一柜子零食';document.querySelector('.since').textContent='✧ 2026.11.24 · 新房间';document.getElementById('view').setAttribute('aria-label','可旋转的3D客厅');document.getElementById('projector').hidden=false;document.querySelector('#tab-shop .deco-tip').textContent='点一件家具，把它放进客厅，再调整位置和颜色。';}
 const canvas=document.getElementById('view');
 let gl=null;try{gl=canvas.getContext('webgl',{antialias:true,alpha:false,depth:true,preserveDrawingBuffer:true})||canvas.getContext('experimental-webgl',{antialias:true,alpha:false,depth:true})}catch(e){}
 const canvas2d=gl?null:canvas.getContext('2d',{alpha:false});
@@ -191,7 +191,7 @@ let locPos,locNor,locCol,locMVP,locWarm,locDim;
 if(gl){let program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,VS));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,FS));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));gl.useProgram(program);
 locPos=gl.getAttribLocation(program,'aPos');locNor=gl.getAttribLocation(program,'aNormal');locCol=gl.getAttribLocation(program,'aColor');locMVP=gl.getUniformLocation(program,'uMVP');locWarm=gl.getUniformLocation(program,'uWarm');locDim=gl.getUniformLocation(program,'uDim');
 gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.clearDepth(1);gl.disable(gl.CULL_FACE)}
-let geom=[];let state={day:false,lamp:true};let geometryDirty=true,buffer=null,count=0;
+let geom=[];let state={day:false,lamp:true,projector:true};let geometryDirty=true,buffer=null,count=0;
 const STORE_KEY=living?'blan-laurie-living-decor-v1':'blan-laurie-bedroom-decor-v1';
 const CATALOG=[
  {kind:'plant',name:'奶油绿植',emoji:'🪴',hint:'让家呼吸'},
@@ -295,6 +295,44 @@ if(living){
  rounded(-2.39,.98,.35,.86,.09,.70,.05,'#d5ada7');
  ellipsoid(-.54,.065,-.29,2.30,.053,1.63,'#ddc9b9',24,8);ellipsoid(-.54,.105,-.29,2.12,.075,1.43,'#fff4e7',24,8);
  for(let i=0;i<16;i++){let a=i*Math.PI*2/16;ellipsoid(-.54+1.86*Math.cos(a),.095,-.29+1.20*Math.sin(a),.39,.09,.37,i%2?'#fff6ea':'#faeddf',12,5)}
+ // Screen and console on the back wall
+ rounded(-1.68,2.12,-3.49,3.42,1.98,.10,.045,'#bd9d8c',3);
+ box(-1.68,2.12,-3.42,3.28,1.84,.035,state.projector?'#b8c8d0':'#fff8ee');
+ if(state.projector){
+ for(let i=0;i<12;i++)box(-1.68,1.22+(i+.5)*.15,-3.395,3.27,.151,.012,['#e4c5c2','#d0b7c9','#b9bbd1','#a2b6c9'][Math.floor(i/3)]);
+ ellipsoid(-.75,2.52,-3.38,.23,.23,.008,'#fce6c5',14,6);
+ tri([-3.30,1.21,-3.37],[-1.98,2.38,-3.37],[-.85,1.21,-3.37],'#929caf');
+ tri([-2.55,1.21,-3.36],[-.76,2.02,-3.36],[-.06,1.21,-3.36],'#727f95');
+ }
+ rounded(-1.68,.37,-2.99,3.25,.64,.78,.07,'#e6cdb5');rounded(-1.68,.73,-2.99,3.32,.10,.84,.035,'#f6e8d9');
+ for(let x of [-2.70,-1.68,-.66]){rounded(x,.39,-2.585,.91,.42,.04,.025,'#f9eee1');box(x,.42,-2.55,.15,.035,.03,'#b89373')}
+ rounded(-1.68,.86,-2.96,.57,.19,.40,.05,'#fdf8ee');ellipsoid(-1.68,.86,-3.165,.12,.075,.015,'#5c656b',12,5);
+ // Coffee table and two mugs
+ for(let x of [-.91,.42])cylinder(x,.36,-.27,.11,.14,.64,'#d3af91',12);
+ rounded(-.23,.70,-.27,1.85,.15,1.15,.075,'#e7c7a9');rounded(-.23,.785,-.27,1.76,.035,1.07,.015,'#f0d8be');
+ for(let x of [-.62,.18]){cylinder(x,.81,-.18,.16,.16,.035,'#bb9d8a',14);cylinder(x,.94,-.18,.105,.085,.21,'#fff8ee',14)}
+ cylinder(.38,.92,-.50,.11,.10,.22,'#d5a8a0',14);ellipsoid(.38,1.07,-.50,.045,.06,.045,state.lamp?'#ffe6a9':'#a88c7c',9,5);
+ // Bookshelf with books and picture frame
+ for(let y of [.15,.77,1.39,2.01,2.63])box(-3.54,y,-1.72,.68,.09,1.38,'#c7a386');
+ for(let z of [-2.43,-1.01])rounded(-3.54,1.38,z,.72,2.62,.085,.026,'#d0ad91');
+ box(-3.89,1.37,-1.72,.07,2.61,1.38,'#e5ccb7');
+ for(let j=0;j<3;j++)for(let i=0;i<6;i++){let h=.25+.05*(i%3);box(-3.48,.82+j*.62+h/2,-2.28+i*.17,.40,h,.12,['#b9a49a','#cfaaa4','#e9d9c3','#a2b5a5'][i%4])}
+ box(-3.30,2.25,-1.38,.035,.32,.37,'#b68e78');box(-3.275,2.25,-1.38,.02,.25,.29,'#f9e8d7');
+ // Display snack cabinet with glass-door frames and gleams
+ rounded(3.02,1.03,-1.75,1.28,1.98,.75,.07,'#d9b99f');box(3.02,1.04,-1.34,1.10,1.76,.05,'#b7a091');
+ for(let y of [.25,.79,1.33,1.89])box(3.02,y,-1.28,1.10,.07,.13,'#f1dcc7');
+ for(let j=0;j<3;j++)for(let i=0;i<3;i++){let x=2.68+i*.34;rounded(x,.50+j*.54,-1.22,.21,.36,.13,.035,['#dfb38d','#e1b4b1','#a8bda6','#f4dfb5'][(i+j)%4],3);box(x,.53+j*.54,-1.145,.15,.10,.009,'#fff1db')}
+ for(let x of [2.43,3.02,3.61])box(x,1.03,-1.10,.045,1.86,.055,'#f6e4d0');
+ for(let y of [.12,1.04,1.94])box(3.02,y,-1.10,1.20,.045,.055,'#f6e4d0');
+ for(let x of [2.92,3.12])rounded(x,1.03,-1.04,.035,.16,.04,.012,'#b48b6e');
+ box(2.61,1.52,-1.07,.026,.53,.009,'#fff2df');box(3.42,.63,-1.07,.026,.35,.009,'#fff2df');
+ // Warm floor lamp, greenery, pouf and pendant
+ cylinder(2.54,.07,1.95,.31,.31,.10,'#bca18a');cylinder(2.54,1.12,1.95,.034,.04,2.1,'#af9074');cylinder(2.54,2.13,1.95,.25,.40,.43,state.lamp?'#fff1cb':'#d6bcaa');
+ ellipsoid(2.54,2.35,1.95,.24,.055,.24,'#fff5e0',12,6);
+ addedFurniture({id:'built-plant',kind:'plant',x:3.23,z:-2.75,r:0,color:0});
+ ellipsoid(2.42,.36,.48,.63,.33,.61,'#e6c6b7',16,8);ellipsoid(2.42,.55,.48,.56,.18,.54,'#f6e4d6',14,7);
+ cylinder(.18,3.27,-.54,.028,.028,.48,'#ba9c86');ellipsoid(.18,2.93,-.54,.36,.20,.36,state.lamp?'#fff2d5':'#e2d0bd',16,8);
+ box(0,-.18,3.68,8.1,.32,.12,'#b8907a');
  // living-room-extra
  }else{
  // delicate moulding and a framed print on the wall
@@ -440,7 +478,8 @@ canvas.addEventListener('pointermove',ev=>{
 const end=(ev)=>{if(dragStart&&pointers.size===1){persist();renderItems()}pointers.delete(ev.pointerId);dragStart=null;oldDistance=0};
 canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);canvas.addEventListener('lostpointercapture',end);
 canvas.addEventListener('wheel',ev=>{ev.preventDefault();targetScale=bounded(targetScale*(1-ev.deltaY*.0009),.79,1.38);request()},{passive:false});
-document.getElementById('reset').addEventListener('click',()=>{targetYaw=.29;targetScale=1;request()});
+document.getElementById('projector').addEventListener('click',()=>{state.projector=!state.projector;document.getElementById('projector').textContent=state.projector?'🎬 投影开':'🎬 投影关';geometryDirty=true;request()});
+ document.getElementById('reset').addEventListener('click',()=>{targetYaw=.29;targetScale=1;request()});
 document.getElementById('time').addEventListener('click',()=>{state.day=!state.day;geometryDirty=true;document.getElementById('timeEmoji').textContent=state.day?'☀️':'🌙';document.getElementById('timeLabel').textContent=state.day?'白天':'夜景';document.getElementById('time').classList.toggle('current',!state.day);request()});
 document.getElementById('light').addEventListener('click',()=>{state.lamp=!state.lamp;geometryDirty=true;document.getElementById('lightLabel').textContent=state.lamp?'暖灯开':'暖灯关';document.getElementById('light').classList.toggle('current',state.lamp);request()});
 const overlay=document.getElementById('overlay');const close=()=>overlay.classList.remove('open');document.getElementById('letterBtn').onclick=()=>overlay.classList.add('open');document.getElementById('close').onclick=close;overlay.onclick=ev=>{if(ev.target===overlay)close()};document.addEventListener('keydown',ev=>{if(ev.key==='Escape')close()});
