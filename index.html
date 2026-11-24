@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
 <meta name="theme-color" content="#e7d7ca" />
-<meta name="home-build" content="2026.11.24.5" />
+<meta name="home-build" content="2026.11.24.6" />
 <title>Blan & Laurie | 可以装修与收藏回忆的奶油卧室 5.0</title>
 <style>
 :root{--brown:#60493f;--rose:#ba887d;--soft:#9c857b;--panel:rgba(255,251,245,.89)}
@@ -72,6 +72,14 @@ html.tiiny-host .overlay{bottom:calc(var(--host-banner-clearance) + max(env(safe
 @media(max-width:420px){.memory-launch{top:calc(max(env(safe-area-inset-top),13px) + 49px);right:11px;font-size:11px;padding:9px 11px}.vault-body{padding:0 16px 16px}.vault-head{padding:17px 16px 9px}.vault-card{border-radius:21px}}
 .room-nav{position:fixed;left:17px;top:calc(max(env(safe-area-inset-top),17px) + 108px);z-index:26;display:flex;gap:5px}.room-nav a,.room-nav button{font:600 12px system-ui,sans-serif;color:#8f7067;background:#fff9f2eb;border:1px solid #fff;border-radius:100px;padding:9px 12px;text-decoration:none;box-shadow:0 5px 16px #795a511c}.room-nav a.active{color:#fff;background:#b78a81}.room-nav button[hidden]{display:none}@media(max-width:420px){.room-nav{left:11px;top:calc(max(env(safe-area-inset-top),13px) + 92px)}.room-nav a,.room-nav button{font-size:11px;padding:8px 9px}}
 .home-update-launch{position:fixed;right:12px;top:calc(max(env(safe-area-inset-top),13px) + 146px);z-index:24;border:1px solid #fff9;border-radius:50px;background:rgba(255,251,245,.94);color:#966d67;font:600 11px system-ui,sans-serif;padding:10px 13px;box-shadow:0 7px 24px #795a511e}.home-update-launch.ready{background:#b78a81;color:white}.home-update-launch:disabled{opacity:.7}@media(max-width:420px){.home-update-launch{right:11px;top:calc(max(env(safe-area-inset-top),13px) + 141px);padding:9px 11px}}
+
+/* Keep the home key and update controls clear of the room navigation row. */
+.home-key-launch{top:calc(max(env(safe-area-inset-top),17px) + 157px);z-index:27}
+.home-update-launch{top:calc(max(env(safe-area-inset-top),17px) + 203px);z-index:27}
+@media(max-width:420px){
+.home-key-launch{top:calc(max(env(safe-area-inset-top),13px) + 136px);z-index:27}
+.home-update-launch{top:calc(max(env(safe-area-inset-top),13px) + 179px);z-index:27}
+}
 </style>
 <script>
 /* Keep the additional bottom clearance only on the Tiiny-hosted version. */
@@ -137,7 +145,7 @@ if (/(^|\.)tiiny\.(site|host)$/.test(location.hostname)) {
 </section>
 
 
-<button class="home-key-launch" id="homeKeyLaunch" aria-label="给 Laurie 送回家状态卡">🔑 回家钥匙</button>
+<button class="home-key-launch" id="homeKeyLaunch" aria-label="带 Laurie 回家，复制房间状态卡">🔑 带 Laurie 回家</button>
 <button class="home-update-launch" id="homeUpdate" aria-label="检查小家更新">↻ 检查更新</button>
 <section class="home-key-layer" id="homeKeyLayer" role="dialog" aria-modal="true" aria-labelledby="homeKeyHeading">
   <div class="home-key-card">
