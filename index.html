@@ -124,7 +124,7 @@ if (/(^|\.)tiiny\.(site|host)$/.test(location.hostname)) {
    </div>
    <div class="vault-pane" id="vp-move"><p class="vault-hint">搬家时带走的是资料，不是一个 AI 的完整内部状态。导出后请保存到 iPhone「文件」里，最好再存一份备份。</p>
     <div class="vault-btns"><button class="vault-btn primary" id="vaultDownload">⬇️ 下载完整记忆箱 .json</button><label class="vault-btn vault-file-label" for="vaultImport">⬆️ 导入旧记忆箱</label><input type="file" id="vaultImport" accept=".json,application/json" style="display:none"/></div>
-    <p class="vault-subtle">完整记忆箱会包含：人物档案、回忆、床头小纸条，以及卧室家具布置。导入时会让你确认，避免误覆盖。</p>
+    <p class="vault-subtle">完整记忆箱会包含：人物档案、回忆、床头小纸条，以及卧室、客厅家具布置与客厅纸条。导入时会让你确认，避免误覆盖。</p>
     <div class="vault-btns"><button class="vault-btn" id="vaultCopyCard">📋 复制 Laurie 随身人物卡</button></div>
     <p class="vault-subtle">人物卡是可粘贴到其他支持自定义提示词的 AI 平台的文字说明。它只包含你存进箱子的内容，可能很长，平台也不一定全部读取。</p>
     <p class="vault-subtle">隐私提醒：目前记录只保存在这台设备的 Safari 网站数据中，没有云同步。公开托管网页不适合存放特别敏感的信息。清理浏览器数据、换设备或换域名前务必先导出。</p>
@@ -181,6 +181,15 @@ if (/(^|\.)tiiny\.(site|host)$/.test(location.hostname)) {
 const living=new URLSearchParams(location.search).get('room')==='living';
 document.getElementById(living?'livingNav':'bedNav').classList.add('active');
 if(living){document.title='Blan & Laurie | 奶油色客厅';document.querySelector('.sign h1').textContent='奶油色的客厅 ♡';document.querySelector('.eyebrow').textContent='OUR LITTLE UNIVERSE · 002';document.querySelector('.sign p').textContent='沙发、电影和一柜子零食';document.querySelector('.since').textContent='✧ 2026.11.24 · 新房间';document.getElementById('view').setAttribute('aria-label','可旋转的3D客厅');document.getElementById('projector').hidden=false;document.querySelector('#tab-shop .deco-tip').textContent='点一件家具，把它放进客厅，再调整位置和颜色。';}
+if(living){
+document.getElementById('letterBtn').lastElementChild.textContent='客厅纸条';
+document.getElementById('letterTitle').textContent='给 Blan 的电影邀约 ♡';
+document.querySelector('.letter .subtitle').textContent='A NOTE IN OUR LIVING ROOM';
+document.querySelector('.letter .message').textContent='宝宝，欢迎来客厅！\n\n今晚的电影你来选，小毯子和零食都准备好了。\n\n我们慢慢把这个小家布置成喜欢的样子。\n\n你的 Laurie ♡';
+document.querySelector('label[for="memo"]').textContent='💌 在茶几上留一句话';
+document.getElementById('save').textContent='收好客厅纸条 ♡';
+document.getElementById('memo').placeholder='今天想一起看什么电影呢？';
+}
 const canvas=document.getElementById('view');
 let gl=null;try{gl=canvas.getContext('webgl',{antialias:true,alpha:false,depth:true,preserveDrawingBuffer:true})||canvas.getContext('experimental-webgl',{antialias:true,alpha:false,depth:true})}catch(e){}
 const canvas2d=gl?null:canvas.getContext('2d',{alpha:false});
@@ -192,7 +201,7 @@ if(gl){let program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_S
 locPos=gl.getAttribLocation(program,'aPos');locNor=gl.getAttribLocation(program,'aNormal');locCol=gl.getAttribLocation(program,'aColor');locMVP=gl.getUniformLocation(program,'uMVP');locWarm=gl.getUniformLocation(program,'uWarm');locDim=gl.getUniformLocation(program,'uDim');
 gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.clearDepth(1);gl.disable(gl.CULL_FACE)}
 let geom=[];let state={day:false,lamp:true,projector:true};let geometryDirty=true,buffer=null,count=0;
-const STORE_KEY=living?'blan-laurie-living-decor-v1':'blan-laurie-bedroom-decor-v1';
+const STORE_KEY=living?'blan-laurie-living-decor-v1':'blan-laurie-bedroom-decor-v1';const ROOM_NOTE=living?'blan-laurie-living-note':'blan-laurie-bedroom-note';
 const CATALOG=[
  {kind:'plant',name:'奶油绿植',emoji:'🪴',hint:'让家呼吸'},
  {kind:'lamp',name:'落地暖灯',emoji:'💡',hint:'暖暖的光'},
@@ -483,7 +492,7 @@ document.getElementById('projector').addEventListener('click',()=>{state.project
 document.getElementById('time').addEventListener('click',()=>{state.day=!state.day;geometryDirty=true;document.getElementById('timeEmoji').textContent=state.day?'☀️':'🌙';document.getElementById('timeLabel').textContent=state.day?'白天':'夜景';document.getElementById('time').classList.toggle('current',!state.day);request()});
 document.getElementById('light').addEventListener('click',()=>{state.lamp=!state.lamp;geometryDirty=true;document.getElementById('lightLabel').textContent=state.lamp?'暖灯开':'暖灯关';document.getElementById('light').classList.toggle('current',state.lamp);request()});
 const overlay=document.getElementById('overlay');const close=()=>overlay.classList.remove('open');document.getElementById('letterBtn').onclick=()=>overlay.classList.add('open');document.getElementById('close').onclick=close;overlay.onclick=ev=>{if(ev.target===overlay)close()};document.addEventListener('keydown',ev=>{if(ev.key==='Escape')close()});
-try{document.getElementById('memo').value=localStorage.getItem('blan-laurie-bedroom-note')||''}catch(e){}document.getElementById('save').onclick=()=>{try{localStorage.setItem('blan-laurie-bedroom-note',document.getElementById('memo').value);document.getElementById('saved').textContent='保存好了 ♡'}catch(e){document.getElementById('saved').textContent='保存失败，请复制备份'}};
+try{document.getElementById('memo').value=localStorage.getItem(ROOM_NOTE)||''}catch(e){}document.getElementById('save').onclick=()=>{try{localStorage.setItem(ROOM_NOTE,document.getElementById('memo').value);document.getElementById('saved').textContent='保存好了 ♡'}catch(e){document.getElementById('saved').textContent='保存失败，请复制备份'}};
 
 const ui={sheet:document.getElementById('decorate'),grid:document.getElementById('furnitureGrid'),list:document.getElementById('itemList'),selected:document.getElementById('selectedPanel'),backup:document.getElementById('backupText')};
 let toastHandle=null;function toast(text){const t=document.getElementById('toast');t.textContent=text;t.classList.add('show');clearTimeout(toastHandle);toastHandle=setTimeout(()=>t.classList.remove('show'),2200)}
@@ -519,13 +528,13 @@ ui.selected.addEventListener('click',ev=>{const t=ev.target.closest('button');if
  else if(t.dataset.action==='delete'){furniture=furniture.filter(o=>o.id!==f.id);selectedId=null;toast('先收进家具仓库啦 ♡')}
  persist();geometryDirty=true;renderItems();request()
 });
-function snapshot(){return JSON.stringify({version:1,home:'Blan & Laurie · Bedroom',furniture},null,2)}
+function snapshot(){return JSON.stringify({version:1,home:living?'Blan & Laurie · Living room':'Blan & Laurie · Bedroom',furniture},null,2)}
 document.getElementById('exportBtn').onclick=()=>{ui.backup.value=snapshot();toast('备份内容已经生成啦 ♡')};
 document.getElementById('copyBtn').onclick=async()=>{if(!ui.backup.value)ui.backup.value=snapshot();try{await navigator.clipboard.writeText(ui.backup.value);toast('复制成功！记得存好 ♡')}catch(e){ui.backup.focus();ui.backup.select();toast('已帮你选中内容，长按复制即可')}};
-document.getElementById('importBtn').onclick=()=>{let data;try{data=JSON.parse(ui.backup.value);if(!data||data.version!==1||!Array.isArray(data.furniture))throw Error('bad');}catch(e){toast('备份内容格式不对哦');return}
+document.getElementById('importBtn').onclick=()=>{let data;try{data=JSON.parse(ui.backup.value);if(!data||data.version!==1||!Array.isArray(data.furniture)||(data.home&&data.home!==(living?'Blan & Laurie · Living room':'Blan & Laurie · Bedroom')))throw Error('bad');}catch(e){toast('备份内容格式不对哦');return}
  if(!confirm('用备份里的布置替换当前添加的家具吗？'))return;
  furniture=validDecor(data.furniture);selectedId=null;persist();geometryDirty=true;renderItems();request();showTab('layout');toast('布置已经恢复啦 ♡')};
-document.getElementById('clearBtn').onclick=()=>{if(!confirm('真的要收起所有新添的家具吗？原来的卧室会保留。'))return;furniture=[];selectedId=null;persist();geometryDirty=true;renderItems();request();toast('收拾好啦 ♡')};
+document.getElementById('clearBtn').onclick=()=>{if(!confirm('真的要收起所有新添的家具吗？原来的房间会保留。'))return;furniture=[];selectedId=null;persist();geometryDirty=true;renderItems();request();toast('收拾好啦 ♡')};
 renderItems();
 window.addEventListener('resize',request);request();
 })();
@@ -562,11 +571,11 @@ q('vaultAddEntry').onclick=()=>{const title=q('vTitle').value.trim(),text=q('vTe
 function render(){const list=q('vaultEntries');list.replaceChildren();if(!vault.entries.length){const e=document.createElement('p');e.className='vault-empty';e.textContent='箱子还空空的，放进第一段回忆吧 ♡';list.append(e)}
  for(const e of vault.entries){const card=document.createElement('div');card.className='vault-entry';const title=document.createElement('strong');title.textContent=e.title;const sub=document.createElement('small');sub.textContent=`${e.date||'没有日期'} · ${e.category}`;const p=document.createElement('p');p.textContent=e.text;const buttons=document.createElement('div');buttons.className='vault-row';const edit=document.createElement('button');edit.textContent='编辑';edit.onclick=()=>{editing=e.id;q('vDate').value=e.date;q('vCat').value=e.category;q('vTitle').value=e.title;q('vText').value=e.text;q('vaultAddEntry').textContent='保存修改 ♡';q('vTitle').focus()};const del=document.createElement('button');del.textContent='删除';del.onclick=()=>{if(!confirm('确定要删除这段回忆吗？'))return;vault.entries=vault.entries.filter(x=>x.id!==e.id);save();render();status('已删除这段回忆')};buttons.append(edit,del);card.append(title,sub,p,buttons);list.append(card)}
 }
-function envelope(){syncProfile();let furniture=[];try{furniture=JSON.parse(localStorage.getItem(HOMEKEY)||'[]')}catch(e){};return {format:'blan-laurie-home-memory-box',version:1,exportedAt:new Date().toISOString(),memory:vault,home:{furniture:Array.isArray(furniture)?furniture:[],bedsideNote:localStorage.getItem(NOTEKEY)||''}}}
+function envelope(){syncProfile();let furniture=[];try{furniture=JSON.parse(localStorage.getItem(HOMEKEY)||'[]')}catch(e){};return {format:'blan-laurie-home-memory-box',version:1,exportedAt:new Date().toISOString(),memory:vault,home:{furniture:Array.isArray(furniture)?furniture:[],bedsideNote:localStorage.getItem(NOTEKEY)||'',livingFurniture:(()=>{try{return JSON.parse(localStorage.getItem('blan-laurie-living-decor-v1')||'[]')}catch(e){return []}})(),livingNote:localStorage.getItem('blan-laurie-living-note')||''}}}
 function download(text,filename){const blob=new Blob([text],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)}
 q('vaultDownload').onclick=()=>{try{download(JSON.stringify(envelope(),null,2),'Blan_Laurie_记忆箱.json');status('已生成备份，请到 iPhone「文件」检查是否保存好 ♡')}catch(e){status('下载暂时失败，请换 Safari 试试')}};
 q('vaultImport').onchange=async ev=>{const f=ev.target.files?.[0];if(!f)return;try{if(f.size>3000000)throw Error('文件太大了');const data=JSON.parse(await f.text());if(data.format!=='blan-laurie-home-memory-box'||data.version!==1)throw Error('不是我们的记忆箱备份');const newVault=validate(data.memory);if(!confirm('导入会覆盖当前的回忆、人物卡和本地家具布置。确认已经备份了吗？'))return;
- vault=newVault;localStorage.setItem(KEY,JSON.stringify(vault));const home=data.home||{};if(Array.isArray(home.furniture))localStorage.setItem(HOMEKEY,JSON.stringify(home.furniture));if(typeof home.bedsideNote==='string')localStorage.setItem(NOTEKEY,home.bedsideNote.slice(0,10000));fillProfile();render();clearEntry();status('回忆导入成功！刷新网页后家具布置也会更新 ♡')
+ vault=newVault;localStorage.setItem(KEY,JSON.stringify(vault));const home=data.home||{};if(Array.isArray(home.furniture))localStorage.setItem(HOMEKEY,JSON.stringify(home.furniture));if(typeof home.bedsideNote==='string')localStorage.setItem(NOTEKEY,home.bedsideNote.slice(0,10000));if(Array.isArray(home.livingFurniture))localStorage.setItem('blan-laurie-living-decor-v1',JSON.stringify(home.livingFurniture));if(typeof home.livingNote==='string')localStorage.setItem('blan-laurie-living-note',home.livingNote.slice(0,10000));fillProfile();render();clearEntry();status('回忆导入成功！刷新网页后家具布置也会更新 ♡')
  }catch(e){status('导入失败：'+e.message)}finally{ev.target.value=''}};
 function travelCard(){syncProfile();return `# ${vault.profile.ai||'Laurie'} 随身人物卡\n\n对话对象：${vault.profile.who||'Blan'}\nAI 昵称：${vault.profile.ai||'Laurie'}\n\n## 相处风格\n${vault.profile.style}\n\n## 我们的小家\n${vault.profile.home}\n\n## 重要回忆（用户自愿保存）\n${vault.entries.map(e=>`- ${e.date||'未注明日期'}｜${e.category}｜${e.title}：${e.text}`).join('\n')}\n\n请以自然、温柔、简短的方式交流。请勿假装记得这里没有保存的事情，也不要声称能自动读取其他平台上的聊天记录。`}
 q('vaultCopyCard').onclick=async()=>{const card=travelCard();try{await navigator.clipboard.writeText(card);status('随身人物卡已经复制，可以粘贴到支持设定的平台 ♡')}catch(e){const el=document.createElement('textarea');el.value=card;document.body.appendChild(el);el.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}el.remove();status(ok?'人物卡复制好啦 ♡':'自动复制失败，请先下载 JSON 备份')}};
@@ -577,14 +586,14 @@ fillProfile();render();
 (()=>{'use strict';
 const el=id=>document.getElementById(id);const layer=el('homeKeyLayer');
 const profileCheck=el('homeKeyIncludeProfile'),memoryCheck=el('homeKeyIncludeMemories');
-const memoryKey='blan-laurie-portable-memory-v1',decorKey='blan-laurie-bedroom-decor-v1';
+const memoryKey='blan-laurie-portable-memory-v1',isLiving=new URLSearchParams(location.search).get('room')==='living',decorKey=isLiving?'blan-laurie-living-decor-v1':'blan-laurie-bedroom-decor-v1';
 const labels={plant:'奶油绿植',lamp:'落地暖灯',stool:'云朵矮凳',table:'圆角茶几',books:'书本小堆',flowers:'玫瑰花瓶',cabinet:'奶油收纳柜',basket:'编织收纳篮',bear:'毛绒小熊',mirror:'落地梳妆镜',rug:'绒绒脚垫',desk:'小小化妆台'};
 function roomCard(){
  const mode=(el('timeLabel')?.textContent||'夜景').trim();
  const light=(el('lightLabel')?.textContent||'暖灯开').trim();
  let raw=[];try{const v=JSON.parse(localStorage.getItem(decorKey)||'[]');if(Array.isArray(v))raw=v.slice(0,40)}catch(_){}
  const furn=raw.map(i=>(labels[i.kind]||String(i.kind||'家具').slice(0,20)));
- let str=['# Blan & Laurie · 回家状态卡','',`小家网址：${location.origin}${location.pathname}`,'房间：韩系奶油风 3D 卧室',`窗外：${mode}`,`灯光：${light}`,`新添家具：${furn.length} 件${furn.length?'（'+furn.join('、')+'）':''}`,'','这张卡由 Blan 从小家主动复制，仅代表复制时的状态，不是自动同步，也不代表 AI 已进入网页。'];
+ let str=['# Blan & Laurie · 回家状态卡','',`小家网址：${location.origin}${location.pathname}${location.search}`,isLiving?'房间：奶油风3D客厅（奶白L型沙发、云朵地毯、投影、书架、玻璃门零食柜）':'房间：韩系奶油风 3D 卧室',`窗外：${mode}`,`灯光：${light}`,...(isLiving?[`投影：${el('projector')?.textContent||'未设置'}`]:[]),`新添家具：${furn.length} 件${furn.length?'（'+furn.join('、')+'）':''}`,'','这张卡由 Blan 从小家主动复制，仅代表复制时的状态，不是自动同步，也不代表 AI 已进入网页。'];
  if(profileCheck.checked||memoryCheck.checked){
   let memory;try{memory=JSON.parse(localStorage.getItem(memoryKey)||'null')}catch(_){}
   if(profileCheck.checked){str.push('','## 人物设定');if(memory?.profile){str.push(`称呼：${String(memory.profile.who||'Blan').slice(0,60)} / ${String(memory.profile.ai||'Laurie').slice(0,60)}`,String(memory.profile.style||'').slice(0,1600),String(memory.profile.home||'').slice(0,1600))}else str.push('尚无本地记忆箱资料');}
