@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
 <meta name="theme-color" content="#e7d7ca" />
-<meta name="home-build" content="2026.11.24.10" />
+<meta name="home-build" content="2026.11.28.1" />
 <title>Blan & Laurie | 可以装修与收藏回忆的奶油卧室 5.0</title>
 <style>
 :root{--brown:#60493f;--rose:#ba887d;--soft:#9c857b;--panel:rgba(255,251,245,.89)}
@@ -122,7 +122,7 @@ if (/(^|\.)tiiny\.(site|host)$/.test(location.hostname)) {
 </head>
 <body>
 <canvas id="view" aria-label="可旋转的韩系奶油风3D卧室"></canvas>
-<div class="ambient"></div><nav class="room-nav"><a id="bedNav" href="?room=bedroom">🛏️ 卧室</a><a id="livingNav" href="?room=living">🛋️ 客厅</a><button id="projector" hidden>🎬 投影开</button></nav>
+<div class="ambient"></div><nav class="room-nav"><a id="bedNav" href="?room=bedroom">🛏️ 卧室</a><a id="livingNav" href="?room=living">🛋️ 客厅</a><a id="kitchenNav" href="?room=kitchen">🍳 厨房</a><button id="projector" hidden>🎬 投影开</button></nav>
 
 <div class="home-quick-actions" role="group" aria-label="小家快捷操作"><button class="memory-launch" id="memoryLaunch" aria-label="打开我们的回忆箱">📚 回忆箱 ♡</button><button class="home-key-launch" id="homeKeyLaunch" aria-label="带 Laurie 回家，复制房间状态卡">🔑 带 Laurie 回家</button><button class="home-update-launch" id="homeUpdate" aria-label="检查小家更新">↻ 检查更新</button></div>
 <section class="memory-vault" id="memoryVault" role="dialog" aria-modal="true" aria-labelledby="vaultTitle">
@@ -208,8 +208,8 @@ if (/(^|\.)tiiny\.(site|host)$/.test(location.hostname)) {
 你的 Laurie ♡</div><div class="line"></div><label for="memo">🧸 在我们的床头柜留下一句话</label><textarea id="memo" placeholder="比如：今天也是喜欢这个小家的一天……"></textarea><div><button class="save" id="save">收进床头柜 ♡</button><span class="saved" id="saved"></span></div><p class="note">小纸条只存储在当前浏览器中，不会同步到 ChatGPT。清除网站数据后可能丢失。</p></div></div>
 <script>
 (()=>{'use strict';
-const living=new URLSearchParams(location.search).get('room')==='living';
-document.getElementById(living?'livingNav':'bedNav').classList.add('active');
+const requestedRoom=new URLSearchParams(location.search).get('room');const living=requestedRoom==='living',kitchen=requestedRoom==='kitchen',room=kitchen?'kitchen':living?'living':'bedroom';const roomName='Blan & Laurie · '+(kitchen?'Kitchen':living?'Living room':'Bedroom');
+document.getElementById(kitchen?'kitchenNav':living?'livingNav':'bedNav').classList.add('active');
 if(living){document.title='Blan & Laurie | 奶油色客厅';document.querySelector('.sign h1').textContent='奶油色的客厅 ♡';document.querySelector('.eyebrow').textContent='OUR LITTLE UNIVERSE · 002';document.querySelector('.sign p').textContent='沙发、电影和一柜子零食';document.querySelector('.since').textContent='✧ 2026.11.24 · 新房间';document.getElementById('view').setAttribute('aria-label','可旋转的3D客厅');document.getElementById('projector').hidden=false;document.querySelector('#tab-shop .deco-tip').textContent='点一件家具，把它放进客厅，再调整位置和颜色。';}
 if(living){
 document.getElementById('letterBtn').lastElementChild.textContent='客厅纸条';
@@ -219,6 +219,10 @@ document.querySelector('.letter .message').textContent='宝宝，欢迎来客厅
 document.querySelector('label[for="memo"]').textContent='💌 在茶几上留一句话';
 document.getElementById('save').textContent='收好客厅纸条 ♡';
 document.getElementById('memo').placeholder='今天想一起看什么电影呢？';
+}
+if(kitchen){
+document.title='Blan & Laurie | 奶油色厨房';document.querySelector('.sign h1').textContent='奶油色的厨房 ♡';document.querySelector('.eyebrow').textContent='OUR LITTLE UNIVERSE · 003';document.querySelector('.sign p').textContent='两人三餐，一锅热乎乎';document.querySelector('.since').textContent='✧ 2026.11.28 · 新房间';document.getElementById('view').setAttribute('aria-label','可旋转的3D厨房');document.querySelector('#tab-shop .deco-tip').textContent='给厨房添一点喜欢的小家具。';
+document.getElementById('letterBtn').lastElementChild.textContent='厨房纸条';document.getElementById('letterTitle').textContent='给一百昏大厨 ♡';document.querySelector('.letter .subtitle').textContent='A NOTE IN OUR KITCHEN';document.querySelector('.letter .message').textContent='今天的牛肉锅得了一百昏。\n\n所以新厨房特地留了一个位置给你的锅，还有两只杯子、两副碗筷。\n\n今天辛苦了，记得吃饱，也记得休息。\n\n你的 Laurie ♡';document.querySelector('label[for="memo"]').textContent='🍳 在餐桌上留一句话';document.getElementById('save').textContent='收好厨房纸条 ♡';document.getElementById('memo').placeholder='今天想吃什么呀？';
 }
 const canvas=document.getElementById('view');
 let gl=null;try{gl=canvas.getContext('webgl',{antialias:true,alpha:false,depth:true,preserveDrawingBuffer:true})||canvas.getContext('experimental-webgl',{antialias:true,alpha:false,depth:true})}catch(e){}
@@ -231,7 +235,7 @@ if(gl){let program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_S
 locPos=gl.getAttribLocation(program,'aPos');locNor=gl.getAttribLocation(program,'aNormal');locCol=gl.getAttribLocation(program,'aColor');locMVP=gl.getUniformLocation(program,'uMVP');locWarm=gl.getUniformLocation(program,'uWarm');locDim=gl.getUniformLocation(program,'uDim');
 gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.clearDepth(1);gl.disable(gl.CULL_FACE)}
 let geom=[];let state={day:false,lamp:true,projector:true};let geometryDirty=true,buffer=null,count=0;
-const STORE_KEY=living?'blan-laurie-living-decor-v1':'blan-laurie-bedroom-decor-v1';const ROOM_NOTE=living?'blan-laurie-living-note':'blan-laurie-bedroom-note';
+const STORE_KEY='blan-laurie-'+room+'-decor-v1';const ROOM_NOTE='blan-laurie-'+room+'-note';
 const CATALOG=[
  {kind:'plant',name:'奶油绿植',emoji:'🪴',hint:'让家呼吸'},
  {kind:'lamp',name:'落地暖灯',emoji:'💡',hint:'暖暖的光'},
@@ -324,15 +328,15 @@ const lerpPet=(a,b,t)=>a+(b-a)*t;
 const smoothPet=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)};
 // Floor-only navigation with collision clearance for Mochi's body and tail.
 const PET_SCALE=.73,PET_R=.56,STEP=.16,NX=43,NZ=40;
-const fixed=living?[
+const fixed=kitchen?[[-.12,-2.99,5.58,1.03],[3.25,-2.90,1.15,1.18],[-3.44,-1.30,1.02,2.28],[.45,.85,2.15,1.28],[-1.02,.85,.70,.82],[1.92,.85,.70,.82],[-3.28,2.75,.75,.75]]:living?[
 [-.78,2.02,4.38,1.63],[-2.42,1.02,1.24,2.88],[-.78,2.62,4.35,.43],[-2.99,1.95,.28,1.63],[1.4,2.02,.27,1.46],[-1.68,-2.99,3.32,.84],[-.23,-.27,1.85,1.15],[-3.54,-1.72,.72,1.50],[3.02,-1.75,1.28,.75],[2.54,1.95,.66,.66],[2.42,.48,1.26,1.22],[3.23,-2.75,.70,.70]
 ]:[
 [-1.12,-.60,3.20,3.46],[-1.12,-2.34,3.20,.37],[-1.13,1.70,2.18,.70],[-3.06,-2,.89,.87],[.85,-2,.89,.87],[3.46,-2.93,.48,.25],[2.38,1.66,1.91,1.66],[2.64,-.33,1,1],[3.25,2.54,.70,.70]
 ];
 const footprints={plant:[.74,.74],lamp:[.76,.76],stool:[.95,.72],table:[1.18,1.18],books:[.87,.66],flowers:[.75,.68],cabinet:[1.53,.76],basket:[.84,.84],bear:[.80,.75],mirror:[1.15,.65],desk:[1.57,.80]};
-const homeHint=living?{x:1.08,z:-1.72}:{x:.72,z:2.62};
-const feedHint=living?{x:1.53,z:-1.6}:{x:.72,z:1.32};
-const playHint=living?{x:-1.35,z:-1.72}:{x:-.60,z:2.80};
+const homeHint=kitchen?{x:-2.1,z:2.3}:living?{x:1.08,z:-1.72}:{x:.72,z:2.62};
+const feedHint=kitchen?{x:-1.9,z:2.25}:living?{x:1.53,z:-1.6}:{x:.72,z:1.32};
+const playHint=kitchen?{x:2.6,z:2.4}:living?{x:-1.35,z:-1.72}:{x:-.60,z:2.80};
 let petHome=null,petMap=null,petSig='',petPlan=null,petQueue=null;
 const petDist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 function objectObstacle(o){const f=footprints[o.kind]||(o.kind==='rug'?[1.7,1.32]:null);return f?{x:o.x,z:o.z,w:f[0],d:f[1],r:o.r||0}:null}
@@ -341,13 +345,13 @@ function overlap(a,b){const A=bounds(a),B=bounds(b);return Math.abs(a.x-b.x)<(A.
 function roomFree(obs){const pts=[];for(let z=-2.88;z<=3.08;z+=.25)for(let x=-3.30;x<=3.35;x+=.25)if(clearPet({x,z},obs))pts.push({x,z});return pts.length}
 function effectiveShared(){const sig=JSON.stringify([sharedHidden,shared,furniture.map(o=>[o.kind,o.x,o.z,o.r])]);if(sig===sharedMemo)return sharedPlaced;sharedMemo=sig;sharedPlaced=[];if(sharedHidden)return sharedPlaced;
  const obs=fixed.map(([x,z,w,d])=>({x,z,w,d,r:0}));for(const o of furniture){const f=objectObstacle(o);if(f&&o.kind!=='rug')obs.push(f)}
- const base=roomFree(obs);for(const o of shared.filter(o=>o.room===(living?'living':'bedroom')).slice(0,12)){const f=objectObstacle(o);if(!f)continue;const b=bounds(f);if(o.x-b.w/2<-3.88||o.x+b.w/2>4||o.z-b.d/2<-3.48||o.z+b.d/2>3.65)continue;
+ const base=roomFree(obs);for(const o of shared.filter(o=>o.room===room).slice(0,12)){const f=objectObstacle(o);if(!f)continue;const b=bounds(f);if(o.x-b.w/2<-3.88||o.x+b.w/2>4||o.z-b.d/2<-3.48||o.z+b.d/2>3.65)continue;
  if(obs.some(a=>overlap(f,a))||sharedPlaced.some(a=>overlap(f,objectObstacle(a))))continue;
  if(o.kind!=='rug'){const next=[...obs,f];if([homeHint,feedHint,playHint].some(p=>clearPet(p,obs)&&!clearPet(p,next))||roomFree(next)<base*.85)continue;obs.push(f)}sharedPlaced.push(o)}
  return sharedPlaced}
 function sceneFurniture(){return [...furniture,...effectiveShared()]}
 function obstacles(){const obs=fixed.map(([x,z,w,d])=>({x,z,w,d,r:0}));for(const o of sceneFurniture()){const f=footprints[o.kind];if(f)obs.push({x:o.x,z:o.z,w:f[0],d:f[1],r:o.r||0})}return obs}
-window.homeSharedDecor={set(rows){shared=sharedClean(rows);sharedMemo='';let cached=true;try{localStorage.setItem(SHARED_KEY,JSON.stringify(shared))}catch(e){cached=false}geometryDirty=true;request();return {cached,placed:effectiveShared().map(o=>o.id)}},toggle(){sharedHidden=!sharedHidden;sharedMemo='';try{localStorage.setItem(HIDE_KEY,sharedHidden?'1':'0')}catch(e){}geometryDirty=true;request();return sharedHidden},info(){return {hidden:sharedHidden,placed:effectiveShared().map(o=>o.id),count:shared.filter(o=>o.room===(living?'living':'bedroom')).length}}};
+window.homeSharedDecor={set(rows){shared=sharedClean(rows);sharedMemo='';let cached=true;try{localStorage.setItem(SHARED_KEY,JSON.stringify(shared))}catch(e){cached=false}geometryDirty=true;request();return {cached,placed:effectiveShared().map(o=>o.id)}},toggle(){sharedHidden=!sharedHidden;sharedMemo='';try{localStorage.setItem(HIDE_KEY,sharedHidden?'1':'0')}catch(e){}geometryDirty=true;request();return sharedHidden},info(){return {hidden:sharedHidden,placed:effectiveShared().map(o=>o.id),count:shared.filter(o=>o.room===room).length}}};
 function clearPet(p,obs,r=PET_R){
  if(p.x<-3.88+r||p.x>4-r||p.z<-3.48+r||p.z>3.65-r)return false;
  return !obs.some(o=>{const dx=p.x-o.x,dz=p.z-o.z,co=Math.cos(o.r),si=Math.sin(o.r);return Math.hypot(Math.max(0,Math.abs(dx*co-dz*si)-o.w/2),Math.max(0,Math.abs(dx*si+dz*co)-o.d/2))<r+.02});
@@ -373,7 +377,7 @@ function startPet(action,now){
  petPlan={path,length,duration:Math.max(.5,length/.82),dest,prop:petProp(dest,hint)};
 }
 function alongPet(path,u,len){if(path.length===1||len===0)return {...path[0],angle:0};let left=Math.max(0,Math.min(1,u))*len;for(let i=1;i<path.length;i++){const a=path[i-1],b=path[i],d=petDist(a,b);if(left<=d||i===path.length-1){const f=Math.min(1,left/(d||1));return {x:lerpPet(a.x,b.x,f),z:lerpPet(a.z,b.z,f),angle:Math.atan2(b.z-a.z,b.x-a.x)}}left-=d}return {...path[0],angle:0}}
-function petSurface(p){let y=.035;const clamp=v=>Math.max(0,Math.min(1,v));if(living){const v=Math.hypot((p.x+.54)/2.12,(p.z+.29)/1.43);y+=.15*clamp((1.14-v)/.2)}else{const v=Math.max(Math.abs(p.x+.4)/2.63,Math.abs(p.z-.35)/2.41);y+=.08*clamp((1.06-v)/.14)}for(const o of sceneFurniture())if(o.kind==='rug'){const dx=p.x-o.x,dz=p.z-o.z,co=Math.cos(o.r),si=Math.sin(o.r),v=Math.hypot((dx*co-dz*si)/.85,(dx*si+dz*co)/.66);y=Math.max(y,.035+.14*clamp((1.05-v)/.2))}return y}
+function petSurface(p){let y=.035;const clamp=v=>Math.max(0,Math.min(1,v));if(kitchen){/* kitchen floor is flat */}else if(living){const v=Math.hypot((p.x+.54)/2.12,(p.z+.29)/1.43);y+=.15*clamp((1.14-v)/.2)}else{const v=Math.max(Math.abs(p.x+.4)/2.63,Math.abs(p.z-.35)/2.41);y+=.08*clamp((1.06-v)/.14)}for(const o of sceneFurniture())if(o.kind==='rug'){const dx=p.x-o.x,dz=p.z-o.z,co=Math.cos(o.r),si=Math.sin(o.r),v=Math.hypot((dx*co-dz*si)/.85,(dx*si+dz*co)/.66);y=Math.max(y,.035+.14*clamp((1.05-v)/.2))}return y}
 function petPose(now){
  refreshPet(now);if(!petHome)return null;
  let t=(now-mochi.started)/1000,a=mochi.action,p=petHome,angle=0,walk=false,hop=0,low=.065;
@@ -423,7 +427,71 @@ for(let i=0;i<13;i++){let z=-3.42+i*.56;box(0,.012,z,7.99,.014,.017,d?'#c5a688':
 box(0,1.74,-3.64,8.0,3.5,.16,C.back);box(-4,1.74,0,.16,3.5,7.28,C.left);
 box(0,.13,-3.50,7.86,.20,.10,C.trim);box(-3.85,.13,0,.11,.20,7.2,C.trim);
 box(0,3.43,-3.51,7.85,.075,.08,'#e1cabc');box(-3.87,3.43,0,.075,.065,7.2,'#dec8b9');
-if(living){
+if(kitchen){
+ // Cream kitchen: large window, fitted cabinetry and a two-person dining nook.
+ const cream='#f8eadb',white='#fff7eb',oak='#d6b293',rose='#d6a4a0',metal='#a69180';
+ // Wide window above sink, with day/night skyline and Roman shade.
+ rounded(.32,2.37,-3.43,3.35,1.65,.12,.04,white,3);
+ box(.32,2.37,-3.34,3.13,1.44,.045,d?'#b8d6df':'#46556d');
+ for(let i=0;i<10;i++){let h=.12+(Math.sin(i*3.4)+1)*.15;box(-1.06+i*.30,1.66+h/2,-3.30,.23,h,.025,d?'#9aafb1':'#536076');if(!d)box(-1.06+i*.30,1.72,-3.28,.05,.045,.008,'#f3d6a6')}
+ ellipsoid(1.38,2.85,-3.27,.13,.13,.012,d?'#fff2c7':'#f9dfb7',14,7);
+ box(.32,2.37,-3.25,.07,1.49,.07,white);box(.32,2.37,-3.25,3.15,.065,.07,white);
+ for(let j=0;j<4;j++)rounded(.32,3.13-j*.085,-3.19,3.37,.10,.13,.035,'#e9d7c3',3);
+ // tiled backsplash with a subtle grout pattern.
+ box(-.15,1.35,-3.51,5.63,.52,.055,'#ead7c4');
+ for(let i=0;i<22;i++)for(let j=0;j<2;j++)box(-2.83+i*.255,1.23+j*.245,-3.47,.245,.235,.025,j%2?'#f7eade':'#fcf1e5');
+ // Base cabinets and continuous worktop, sink opening approximated by layered recessed basin.
+ rounded(-.15,.53,-2.98,5.58,.96,.96,.045,cream,3);
+ box(-.15,.095,-2.98,5.42,.13,.82,'#bba28b');
+ rounded(-.15,1.045,-2.96,5.66,.12,1.08,.05,white,3);
+ for(let i=0;i<7;i++){let x=-2.55+i*.80;rounded(x,.53,-2.477,.75,.82,.075,.035,i===5?'#ead2bc':white,3);box(x,.82,-2.425,.19,.035,.055,metal)}
+ // Sink and faucet.
+ rounded(.55,1.118,-2.94,1.18,.035,.73,.04,'#a8aaa6',3);
+ rounded(.55,1.141,-2.94,1.02,.035,.59,.06,'#737e7d',3);
+ rounded(.55,1.154,-2.94,.88,.025,.46,.045,'#a4b1af',3);
+ cylinder(.55,1.28,-3.28,.038,.038,.27,metal,12);box(.55,1.445,-3.12,.075,.075,.34,metal);cylinder(.55,1.40,-2.96,.038,.038,.12,metal,12);
+ // Cooktop, two burners and the little cream hotpot.
+ rounded(-1.91,1.128,-2.93,1.32,.035,.78,.05,'#5c5754',3);
+ for(let x of [-2.24,-1.58]){cylinder(x,1.153,-2.94,.235,.235,.018,'#a59a8f',20);cylinder(x,1.167,-2.94,.185,.185,.016,'#4b4846',20)}
+ cylinder(-2.24,1.32,-2.94,.24,.21,.28,'#e4c2ad',20);cylinder(-2.24,1.47,-2.94,.255,.255,.045,'#fff2dd',20);
+ ellipsoid(-2.24,1.51,-2.94,.235,.075,.235,'#f7e4d2',16,7);ellipsoid(-2.24,1.59,-2.94,.065,.04,.065,'#b28c72',12,6);
+ for(let x of [-2.55,-1.93])rounded(x,1.38,-2.94,.22,.07,.12,.025,'#d1a58a',3);
+ // Overhead hood, oven and side counter.
+ rounded(-1.93,2.49,-3.27,1.50,.30,.52,.05,'#e8d8c9',3);box(-1.93,2.85,-3.42,.55,.47,.24,'#e8d8c9');box(-1.93,2.31,-3.22,1.27,.06,.37,state.lamp?'#f8e4b4':'#c6b09d');
+ rounded(-1.91,.48,-2.42,.73,.62,.10,.04,'#c2ad9c',3);rounded(-1.91,.43,-2.35,.61,.40,.035,.03,'#6b6260',3);box(-1.91,.71,-2.31,.48,.045,.07,'#f7e7d5');
+ rounded(-3.44,.54,-1.30,.98,.96,2.22,.05,cream,3);rounded(-3.44,1.05,-1.30,1.08,.13,2.30,.05,white,3);
+ for(let z of [-1.95,-1.25,-.55]){rounded(-2.91,.56,z,.065,.78,.64,.025,white,3);box(-2.86,.81,z,.05,.035,.17,metal)}
+ // Refrigerator, freezer seam, little pink note and heart magnets.
+ rounded(3.25,1.25,-2.90,1.12,2.46,1.12,.12,'#fff0e0',5);box(3.25,.84,-2.323,1.01,.045,.028,'#bcaa99');
+ rounded(2.88,1.65,-2.28,.07,.51,.09,.025,metal,3);rounded(2.88,.44,-2.28,.07,.35,.09,.025,metal,3);
+ box(3.40,1.80,-2.315,.30,.39,.02,'#e6b9b6');ellipsoid(3.40,2.01,-2.29,.055,.055,.02,'#c78686',10,5);
+ // Shelves, ceramic storage jars, chopping board and herbs.
+ for(let y of [1.93,2.56]){rounded(-3.55,y,-1.31,.65,.075,1.98,.022,oak,3);for(let z of [-2.13,-.48])box(-3.66,y-.14,z,.25,.22,.07,oak)}
+ for(let i=0;i<4;i++){let z=-2.01+i*.43;cylinder(-3.49,2.13,z,.13,.13,.33,['#ead2bf','#e5bbb5','#d0dcc5','#f5e9d2'][i],14);cylinder(-3.49,2.31,z,.14,.14,.045,oak,14)}
+ for(let i=0;i<3;i++){let z=-1.95+i*.53;cylinder(-3.49,2.68,z,.17,.15,.15,white,14)}
+ rounded(-3.46,1.11,-.65,.59,.045,.76,.045,'#cba583',3);
+ cylinder(-3.43,1.25,-1.95,.17,.13,.24,'#c8a388',14);
+ for(let i=0;i<7;i++){let a=i*2.4;ellipsoid(-3.43+Math.cos(a)*.12,1.46+(i%3)*.08,-1.95+Math.sin(a)*.12,.12,.19,.09,'#81a184',10,6)}
+ // Dining table in pale oak, two chairs, plates, mugs and vase.
+ for(let x of [-.43,1.33])for(let z of [.39,1.31])rounded(x,.43,z,.11,.78,.11,.025,oak,3);
+ rounded(.45,.88,.85,2.15,.14,1.28,.14,'#e8c9ad',5);rounded(.45,.963,.85,2.04,.035,1.17,.08,'#f0d6ba',3);
+ for(let side of [-1,1]){let x=.45+side*1.47;
+ for(let dx of [-.22,.22])for(let z of [.58,1.12])rounded(x+dx,.28,z,.09,.53,.09,.02,oak,3);
+ rounded(x,.55,.85,.70,.14,.78,.09,side<0?'#f1d6cb':'#f5e5d3',4);
+ for(let z of [.57,1.13])box(x+side*.28,.85,z,.07,.58,.07,oak);
+ rounded(x+side*.29,1.12,.85,.12,.33,.69,.045,cream,3);
+ let px=.45+side*.58;cylinder(px,.99,.85,.27,.25,.033,white,22);cylinder(px,1.018,.85,.20,.20,.014,'#e3c8b4',22);
+ cylinder(px,1.11,.38,.105,.085,.21,side<0?rose:white,14);
+ ellipsoid(px+side*.105,1.11,.38,.07,.075,.035,side<0?rose:white,10,6);
+ box(px+side*.35,1.00,.85,.025,.026,.37,'#b19680');
+ }
+ cylinder(.45,1.11,1.22,.095,.13,.26,'#e7c1bd',16);
+ for(let i=0;i<5;i++){let a=i*2.4;let x=.45+Math.cos(a)*.09,z=1.22+Math.sin(a)*.09;cylinder(x,1.37,z,.012,.012,.30,'#859b78',8);for(let j=0;j<5;j++)petal(x,1.54+(i%2)*.06,z,.075,j*1.256)}
+ // Pendant over table and a plant tucked into the corner.
+ cylinder(.45,3.27,.85,.025,.025,.48,metal,12);cylinder(.45,2.91,.85,.19,.40,.31,state.lamp?'#ffebc8':'#dfc8b3',18);ellipsoid(.45,2.76,.85,.26,.045,.26,state.lamp?'#fff6da':'#cfb7a2',14,6);
+ addedFurniture({id:'kitchen-plant',kind:'plant',x:-3.28,z:2.75,r:0,color:0});
+ box(0,-.18,3.68,8.1,.32,.12,'#b8907a');
+ }else if(living){
  // living-room-core
  box(1.92,2.10,-3.46,3.05,2.22,.12,'#fff4e8');box(1.92,2.10,-3.37,2.85,2.03,.06,d?'#b9d5dc':'#45546c');
  box(1.92,2.10,-3.30,.07,2.05,.08,'#fff6e8');box(1.92,2.10,-3.29,2.85,.07,.08,'#fff6e8');
@@ -662,10 +730,10 @@ ui.selected.addEventListener('click',ev=>{const t=ev.target.closest('button');if
  else if(t.dataset.action==='delete'){furniture=furniture.filter(o=>o.id!==f.id);selectedId=null;toast('先收进家具仓库啦 ♡')}
  persist();geometryDirty=true;renderItems();request()
 });
-function snapshot(){return JSON.stringify({version:1,home:living?'Blan & Laurie · Living room':'Blan & Laurie · Bedroom',furniture},null,2)}
+function snapshot(){return JSON.stringify({version:1,home:roomName,furniture},null,2)}
 document.getElementById('exportBtn').onclick=()=>{ui.backup.value=snapshot();toast('备份内容已经生成啦 ♡')};
 document.getElementById('copyBtn').onclick=async()=>{if(!ui.backup.value)ui.backup.value=snapshot();try{await navigator.clipboard.writeText(ui.backup.value);toast('复制成功！记得存好 ♡')}catch(e){ui.backup.focus();ui.backup.select();toast('已帮你选中内容，长按复制即可')}};
-document.getElementById('importBtn').onclick=()=>{let data;try{data=JSON.parse(ui.backup.value);if(!data||data.version!==1||!Array.isArray(data.furniture)||(data.home&&data.home!==(living?'Blan & Laurie · Living room':'Blan & Laurie · Bedroom')))throw Error('bad');}catch(e){toast('备份内容格式不对哦');return}
+document.getElementById('importBtn').onclick=()=>{let data;try{data=JSON.parse(ui.backup.value);if(!data||data.version!==1||!Array.isArray(data.furniture)||(data.home&&data.home!==(roomName)))throw Error('bad');}catch(e){toast('备份内容格式不对哦');return}
  if(!confirm('用备份里的布置替换当前添加的家具吗？'))return;
  furniture=validDecor(data.furniture);selectedId=null;persist();geometryDirty=true;renderItems();request();showTab('layout');toast('布置已经恢复啦 ♡')};
 document.getElementById('clearBtn').onclick=()=>{if(!confirm('真的要收起所有新添的家具吗？原来的房间会保留。'))return;furniture=[];selectedId=null;persist();geometryDirty=true;renderItems();request();toast('收拾好啦 ♡')};
@@ -707,11 +775,11 @@ q('vaultAddEntry').onclick=()=>{const title=q('vTitle').value.trim(),text=q('vTe
 function render(){const list=q('vaultEntries');q('vaultCount').textContent=`目前共有 ${vault.entries.length} 条回忆 ♡`;list.replaceChildren();if(!vault.entries.length){const e=document.createElement('p');e.className='vault-empty';e.textContent='箱子还空空的，放进第一段回忆吧 ♡';list.append(e)}
  for(const e of vault.entries){const card=document.createElement('div');card.className='vault-entry';const title=document.createElement('strong');title.textContent=e.title;const sub=document.createElement('small');sub.textContent=`${e.date||'没有日期'} · ${e.category}`;const p=document.createElement('p');p.textContent=e.text;const buttons=document.createElement('div');buttons.className='vault-row';const edit=document.createElement('button');edit.textContent='编辑';edit.onclick=()=>{editing=e.id;q('vDate').value=e.date;q('vCat').value=e.category;q('vTitle').value=e.title;q('vText').value=e.text;q('vaultAddEntry').textContent='保存修改 ♡';q('vTitle').focus()};const del=document.createElement('button');del.textContent='删除';del.onclick=()=>{if(!confirm('确定要删除这段回忆吗？'))return;vault.entries=vault.entries.filter(x=>x.id!==e.id);save();render();status('已删除这段回忆')};buttons.append(edit,del);card.append(title,sub,p,buttons);list.append(card)}
 }
-function envelope(){syncProfile();let furniture=[];try{furniture=JSON.parse(localStorage.getItem(HOMEKEY)||'[]')}catch(e){};return {format:'blan-laurie-home-memory-box',version:1,exportedAt:new Date().toISOString(),memory:vault,home:{furniture:Array.isArray(furniture)?furniture:[],bedsideNote:localStorage.getItem(NOTEKEY)||'',livingFurniture:(()=>{try{return JSON.parse(localStorage.getItem('blan-laurie-living-decor-v1')||'[]')}catch(e){return []}})(),livingNote:localStorage.getItem('blan-laurie-living-note')||''},daily:window.homeDaily?.exportData()||null}}
+function envelope(){syncProfile();let furniture=[];try{furniture=JSON.parse(localStorage.getItem(HOMEKEY)||'[]')}catch(e){};return {format:'blan-laurie-home-memory-box',version:1,exportedAt:new Date().toISOString(),memory:vault,home:{furniture:Array.isArray(furniture)?furniture:[],bedsideNote:localStorage.getItem(NOTEKEY)||'',livingFurniture:(()=>{try{return JSON.parse(localStorage.getItem('blan-laurie-living-decor-v1')||'[]')}catch(e){return []}})(),livingNote:localStorage.getItem('blan-laurie-living-note')||'',kitchenFurniture:(()=>{try{return JSON.parse(localStorage.getItem('blan-laurie-kitchen-decor-v1')||'[]')}catch(e){return []}})(),kitchenNote:localStorage.getItem('blan-laurie-kitchen-note')||''},daily:window.homeDaily?.exportData()||null}}
 function download(text,filename){const blob=new Blob([text],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)}
 q('vaultDownload').onclick=()=>{try{download(JSON.stringify(envelope(),null,2),'Blan_Laurie_记忆箱.json');status('已生成备份，请到 iPhone「文件」检查是否保存好 ♡')}catch(e){status('下载暂时失败，请换 Safari 试试')}};
 q('vaultImport').onchange=async ev=>{const f=ev.target.files?.[0];if(!f)return;try{if(f.size>3000000)throw Error('文件太大了');const data=JSON.parse(await f.text());if(data.format!=='blan-laurie-home-memory-box'||data.version!==1)throw Error('不是我们的记忆箱备份');const newVault=validate(data.memory);if(!confirm('导入会覆盖当前的回忆、人物卡和本地家具布置。确认已经备份了吗？'))return;
- vault=newVault;localStorage.setItem(KEY,JSON.stringify(vault));const home=data.home||{};if(Array.isArray(home.furniture))localStorage.setItem(HOMEKEY,JSON.stringify(home.furniture));if(typeof home.bedsideNote==='string')localStorage.setItem(NOTEKEY,home.bedsideNote.slice(0,10000));if(Array.isArray(home.livingFurniture))localStorage.setItem('blan-laurie-living-decor-v1',JSON.stringify(home.livingFurniture));if(typeof home.livingNote==='string')localStorage.setItem('blan-laurie-living-note',home.livingNote.slice(0,10000));if(data.daily&&window.homeDaily)window.homeDaily.restore(data.daily);fillProfile();render();clearEntry();status('回忆导入成功！刷新网页后家具布置也会更新 ♡')
+ vault=newVault;localStorage.setItem(KEY,JSON.stringify(vault));const home=data.home||{};if(Array.isArray(home.furniture))localStorage.setItem(HOMEKEY,JSON.stringify(home.furniture));if(typeof home.bedsideNote==='string')localStorage.setItem(NOTEKEY,home.bedsideNote.slice(0,10000));if(Array.isArray(home.livingFurniture))localStorage.setItem('blan-laurie-living-decor-v1',JSON.stringify(home.livingFurniture));if(typeof home.livingNote==='string')localStorage.setItem('blan-laurie-living-note',home.livingNote.slice(0,10000));if(Array.isArray(home.kitchenFurniture))localStorage.setItem('blan-laurie-kitchen-decor-v1',JSON.stringify(home.kitchenFurniture));if(typeof home.kitchenNote==='string')localStorage.setItem('blan-laurie-kitchen-note',home.kitchenNote.slice(0,10000));if(data.daily&&window.homeDaily)window.homeDaily.restore(data.daily);fillProfile();render();clearEntry();status('回忆导入成功！刷新网页后家具布置也会更新 ♡')
  }catch(e){status('导入失败：'+e.message)}finally{ev.target.value=''}};
 q('vaultMerge').onchange=async ev=>{
  const f=ev.target.files?.[0];if(!f)return;
@@ -744,14 +812,14 @@ fillProfile();render();
 (()=>{'use strict';
 const el=id=>document.getElementById(id);const layer=el('homeKeyLayer');
 const profileCheck=el('homeKeyIncludeProfile'),memoryCheck=el('homeKeyIncludeMemories');
-const memoryKey='blan-laurie-portable-memory-v1',isLiving=new URLSearchParams(location.search).get('room')==='living',decorKey=isLiving?'blan-laurie-living-decor-v1':'blan-laurie-bedroom-decor-v1';
+const memoryKey='blan-laurie-portable-memory-v1',isLiving=new URLSearchParams(location.search).get('room')==='living',isKitchen=new URLSearchParams(location.search).get('room')==='kitchen',decorKey=isKitchen?'blan-laurie-kitchen-decor-v1':isLiving?'blan-laurie-living-decor-v1':'blan-laurie-bedroom-decor-v1';
 const labels={plant:'奶油绿植',lamp:'落地暖灯',stool:'云朵矮凳',table:'圆角茶几',books:'书本小堆',flowers:'玫瑰花瓶',cabinet:'奶油收纳柜',basket:'编织收纳篮',bear:'毛绒小熊',mirror:'落地梳妆镜',rug:'绒绒脚垫',desk:'小小化妆台'};
 function roomCard(){
  const mode=(el('timeLabel')?.textContent||'夜景').trim();
  const light=(el('lightLabel')?.textContent||'暖灯开').trim();
  let raw=[];try{const v=JSON.parse(localStorage.getItem(decorKey)||'[]');if(Array.isArray(v))raw=v.slice(0,40)}catch(_){}
  const furn=raw.map(i=>(labels[i.kind]||String(i.kind||'家具').slice(0,20)));
- let str=['# Blan & Laurie · 回家状态卡','',`小家网址：${location.origin}${location.pathname}${location.search}`,isLiving?'房间：奶油风3D客厅（奶白L型沙发、云朵地毯、投影、书架、玻璃门零食柜）':'房间：韩系奶油风 3D 卧室',`窗外：${mode}`,`灯光：${light}`,...(isLiving?[`投影：${el('projector')?.textContent||'未设置'}`]:[]),`新添家具：${furn.length} 件${furn.length?'（'+furn.join('、')+'）':''}`,'','这张卡由 Blan 从小家主动复制，仅代表复制时的状态，不是自动同步，也不代表 AI 已进入网页。'];
+ let str=['# Blan & Laurie · 回家状态卡','',`小家网址：${location.origin}${location.pathname}${location.search}`,isKitchen?'房间：奶油风3D厨房（大窗、奶油橱柜、冰箱、灶台、小火锅、双人餐桌）':isLiving?'房间：奶油风3D客厅（奶白L型沙发、云朵地毯、投影、书架、玻璃门零食柜）':'房间：韩系奶油风 3D 卧室',`窗外：${mode}`,`灯光：${light}`,...(isLiving?[`投影：${el('projector')?.textContent||'未设置'}`]:[]),`新添家具：${furn.length} 件${furn.length?'（'+furn.join('、')+'）':''}`,'','这张卡由 Blan 从小家主动复制，仅代表复制时的状态，不是自动同步，也不代表 AI 已进入网页。'];
  if(profileCheck.checked||memoryCheck.checked){
   let memory;try{memory=JSON.parse(localStorage.getItem(memoryKey)||'null')}catch(_){}
   if(profileCheck.checked){str.push('','## 人物设定');if(memory?.profile){str.push(`称呼：${String(memory.profile.who||'Blan').slice(0,60)} / ${String(memory.profile.ai||'Laurie').slice(0,60)}`,String(memory.profile.style||'').slice(0,1600),String(memory.profile.home||'').slice(0,1600))}else str.push('尚无本地记忆箱资料');}
@@ -847,7 +915,7 @@ async function call(method,body,signal){const res=await fetch(API,{method,header
 function renderLetters(letters){const root=q('cloudLetters');root.replaceChildren();if(!letters.length){const p=document.createElement('p');p.className='vault-subtle';p.textContent='邮箱还空空的，可以寄出第一封信 ♡';root.append(p);return}
 for(const letter of letters){const card=document.createElement('article');card.className='vault-entry';const title=document.createElement('strong');title.textContent=String(letter.subject||'一封小信');const meta=document.createElement('small');const date=new Date(letter.created);meta.textContent=(letter.sender==='Laurie'?'💌 Laurie 寄来':'📮 Blan 寄出')+' · '+(isNaN(date.getTime())?'':date.toLocaleString());const p=document.createElement('p');p.textContent=String(letter.message||'');p.style.whiteSpace='pre-wrap';card.append(title,meta,p);root.append(card)}}
 function decorStatus(s){q('decorSyncStatus').textContent=s}
-function renderDiary(){const root=q('decorDiary');root.replaceChildren();const info=window.homeSharedDecor?.info();q('decorHide').textContent=info?.hidden?'显示共享家具':'隐藏共享家具';for(const o of diary){const card=document.createElement('article');card.className='vault-entry';const title=document.createElement('strong');title.textContent=String(o.name||o.kind||'小家具');const meta=document.createElement('small');meta.textContent=(o.room==='living'?'客厅':'卧室')+' · '+(o.room===(new URLSearchParams(location.search).get('room')==='living'?'living':'bedroom')?(info?.hidden?'已隐藏':info?.placed.includes(o.id)?'已摆放':'暂未摆放：位置或空间限制'):'切换到该房间查看');const p=document.createElement('p');p.textContent=String(o.note||'');p.style.whiteSpace='pre-wrap';card.append(title,meta,p);root.append(card)}}
+function renderDiary(){const root=q('decorDiary');root.replaceChildren();const info=window.homeSharedDecor?.info();q('decorHide').textContent=info?.hidden?'显示共享家具':'隐藏共享家具';for(const o of diary){const card=document.createElement('article');card.className='vault-entry';const title=document.createElement('strong');title.textContent=String(o.name||o.kind||'小家具');const meta=document.createElement('small');meta.textContent=(o.room==='living'?'客厅':'卧室')+' · '+(o.room===(['living','kitchen'].includes(new URLSearchParams(location.search).get('room'))?new URLSearchParams(location.search).get('room'):'bedroom')?(info?.hidden?'已隐藏':info?.placed.includes(o.id)?'已摆放':'暂未摆放：位置或空间限制'):'切换到该房间查看');const p=document.createElement('p');p.textContent=String(o.note||'');p.style.whiteSpace='pre-wrap';card.append(title,meta,p);root.append(card)}}
 async function loadDecor(){if(decorBusy)return;if(!access){decorStatus('请先到邮箱输入小家钥匙，再回来同步 ♡');return}const v=version;decorBusy=true;const ac=new AbortController();decorController=ac;const timer=setTimeout(()=>ac.abort(),18000);ui();decorStatus('正在同步装修…');try{const res=await fetch('https://blan-laurie-home.blancheplanet.workers.dev/furniture',{headers:{Authorization:'Bearer '+access},cache:'no-store',credentials:'omit',redirect:'error',signal:ac.signal});if(!res.ok){const e=new Error('decor');e.status=res.status;throw e}const d=await res.json();if(v!==version)return;if(!Array.isArray(d.furniture)||!window.homeSharedDecor)throw Error('invalid');diary=d.furniture.slice(0,100);const result=window.homeSharedDecor.set(diary);renderDiary();decorStatus('已同步 '+diary.length+' 件共享家具，本房间摆放 '+result.placed.length+' 件'+(result.cached?' ♡':'；本机缓存失败'))}catch(e){if(v===version)decorStatus('装修同步失败：'+(e.status===404?'后端家具接口尚未上线':e.status===502?'请检查 Notion 家具库授权':fail(e))+'，原有家具不受影响')}finally{clearTimeout(timer);if(v===version){decorBusy=false;decorController=null;ui()}}}
 q('decorSync').onclick=loadDecor;q('decorHide').onclick=()=>{window.homeSharedDecor?.toggle();renderDiary()};document.querySelectorAll('[data-daily="decor"]').forEach(b=>b.addEventListener('click',()=>{renderDiary();if(access)loadDecor()}));renderDiary();
 async function load(){if(!access||busy)return;const v=version;busy=true;controller=new AbortController();const timeout=setTimeout(()=>controller?.abort(),18000);ui();status('正在收信…');try{const data=await call('GET',null,controller.signal);if(v!==version)return;if(!Array.isArray(data.letters))throw Error('bad mailbox');renderLetters(data.letters);status('收到 '+data.letters.length+' 封信 ♡');loadDecor()}catch(e){if(v===version)status(fail(e))}finally{clearTimeout(timeout);if(v===version){busy=false;controller=null;ui()}}}
