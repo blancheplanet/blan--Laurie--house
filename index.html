@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
 <meta name="theme-color" content="#e7d7ca" />
-<meta name="home-build" content="2026.11.28.1" />
+<meta name="home-build" content="2026.11.28.2" />
 <title>Blan & Laurie | 可以装修与收藏回忆的奶油卧室 5.0</title>
 <style>
 :root{--brown:#60493f;--rose:#ba887d;--soft:#9c857b;--panel:rgba(255,251,245,.89)}
@@ -80,6 +80,21 @@ html.tiiny-host .overlay{bottom:calc(var(--host-banner-clearance) + max(env(safe
 .home-key-launch{z-index:27}
 .home-update-launch{top:calc(max(env(safe-area-inset-top),13px) + 135px);z-index:27}
 }
+
+/* Interactive kitchen */
+#cookLaunch{background:#b9857d;color:#fff;border-color:#fff;display:flex;gap:6px;align-items:center}
+#cookLaunch[hidden]{display:none}
+#cookHotspot{position:fixed;z-index:24;transform:translate(-50%,-100%);border:1px solid white;background:#fff9f2ed;color:#94695e;border-radius:99px;padding:7px 11px;font:600 11px system-ui;box-shadow:0 3px 12px #62463d33;cursor:pointer}
+#cookHotspot[hidden]{display:none}
+#cookLayer{z-index:130}.cook-card{width:min(100%,440px);max-height:88dvh;overflow:auto;padding:20px;background:#fffaf4;border-radius:26px;border:1px solid white;box-shadow:0 20px 60px #49332e55;color:#795d52}
+.cook-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.cook-head h2{font:500 24px Georgia,'Songti SC',serif;margin:3px 0 8px}.cook-head small{font-size:10px;letter-spacing:.14em;color:#b3867c}
+.cook-recipes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:12px 0}.cook-choice,.cook-ingredient{border:1px solid #e7d2c6;border-radius:13px;background:#fffdf9;color:#82645b;font:600 12px inherit;padding:10px 5px;min-height:48px;cursor:pointer}.cook-choice.active,.cook-ingredient.done{background:#f3dcd4;border-color:#d5aca2}.cook-choice span,.cook-ingredient span{display:block;font-size:25px;margin-bottom:4px}
+.cook-ingredients{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.cook-ingredient:disabled{opacity:.68;cursor:default}
+.cook-visual{position:relative;height:135px;overflow:hidden;border-radius:18px;background:linear-gradient(#fae8d9,#fff4e7);display:flex;align-items:center;justify-content:center;margin:10px 0}
+.cook-pot{position:relative;width:150px;height:73px;border-radius:15px 15px 45px 45px;background:#dcae9c;box-shadow:inset 0 -8px #c99989,0 7px 0 #bfa18b66;margin-top:20px}.cook-pot:before,.cook-pot:after{content:'';position:absolute;width:24px;height:14px;background:#bd9782;border-radius:7px;top:15px}.cook-pot:before{left:-20px}.cook-pot:after{right:-20px}.cook-broth{position:absolute;top:-12px;left:5px;right:5px;height:32px;border-radius:50%;background:#b7835d;border:4px solid #f4d0bb;display:flex;align-items:center;justify-content:center;gap:1px;overflow:hidden;font-size:20px}
+.cook-flame{position:absolute;bottom:5px;font-size:21px;letter-spacing:4px;display:none}.cook-visual.heating .cook-flame{display:block;animation:cookflicker .6s alternate infinite}.cook-steam{position:absolute;top:5px;left:0;right:0;text-align:center;opacity:0;color:#ad9387;font-size:28px;letter-spacing:15px}.cook-visual.heating .cook-steam{animation:cooksteam 1.6s infinite}.cook-visual.ready .cook-steam{opacity:.8}.cook-visual.served .cook-pot,.cook-visual.served .cook-steam{display:none}.cook-dish{display:none;font-size:49px;text-align:center}.cook-visual.served .cook-dish{display:block}
+@keyframes cooksteam{0%{transform:translateY(10px);opacity:0}50%{opacity:.8}100%{transform:translateY(-7px);opacity:0}}@keyframes cookflicker{from{transform:scale(.92)}to{transform:scale(1.06)}}@media(prefers-reduced-motion:reduce){.cook-visual.heating .cook-steam,.cook-visual.heating .cook-flame{animation:none;opacity:1}}
+.cook-progress{height:9px;border-radius:10px;background:#ecd8cc;overflow:hidden;margin:10px 0}.cook-progress span{display:block;height:100%;background:#b9847a;transition:width .3s;width:0}.cook-status{font-size:13px;line-height:1.6;min-height:42px;margin:9px 0}.cook-actions{display:flex;flex-wrap:wrap;gap:8px}.cook-actions button{flex:1}.cook-actions button:disabled{opacity:.45}.cook-history{font-size:12px;line-height:1.7;color:#96766b}.cook-history p{margin:5px 0}.cook-step{font-size:12px;font-weight:650;color:#9b7669;margin:12px 0 7px}
 </style>
 <script>
 /* Keep the additional bottom clearance only on the Tiiny-hosted version. */
@@ -172,13 +187,25 @@ if (/(^|\.)tiiny\.(site|host)$/.test(location.hostname)) {
 
 <div class="top"><div class="sign"><div class="eyebrow">OUR LITTLE UNIVERSE · 001</div><h1>奶油色的卧室 ♡</h1><p>Blan & Laurie 的温柔小家</p></div><div class="since">✧ 2026.11.23 · 入住</div></div>
 <div class="err" id="err">这个浏览器暂时不支持 3D 渲染。请用 Safari 打开已经发布的小家网址 ♡</div>
-<div class="bottom"><div class="guide" id="guide">↔ 轻轻左右滑动 · 双指放大</div><button class="daily-launch" id="dailyLaunch">🐾 小家日常 ♡</button><div class="toolbar">
+<div class="bottom"><div class="guide" id="guide">↔ 轻轻左右滑动 · 双指放大</div><button class="daily-launch" id="cookLaunch" hidden>🍳 开始做饭 ♡</button><button class="daily-launch" id="dailyLaunch">🐾 小家日常 ♡</button><div class="toolbar">
 <button class="control current" id="time"><span class="emoji" id="timeEmoji">🌙</span><span id="timeLabel">夜景</span></button>
 <button class="control current" id="light"><span class="emoji">🕯️</span><span id="lightLabel">暖灯开</span></button>
 <button class="control letterbtn" id="letterBtn"><span class="emoji">💌</span><span>床头情书</span></button>
 <button class="control deco" id="decorateBtn"><span class="emoji">🪄</span><span>装修</span></button>
 <button class="control" id="reset"><span class="emoji">↺</span><span>复位视角</span></button>
 </div><div class="foot">our home grows with us · ♡</div></div>
+<button id="cookHotspot" hidden aria-label="打开灶台做饭">🍳 灶台</button>
+<section class="overlay" id="cookLayer" role="dialog" aria-modal="true" aria-labelledby="cookHeading"><div class="cook-card">
+<div class="cook-head"><div><small>BLAN &amp; LAURIE · LITTLE KITCHEN</small><h2 id="cookHeading">今天吃什么？ ♡</h2></div><button class="vault-x" id="cookClose" aria-label="关闭厨房">×</button></div>
+<div class="cook-recipes" id="cookRecipes" aria-label="选择菜谱"></div>
+<div class="cook-visual" id="cookVisual"><div class="cook-steam">〰〰〰</div><div class="cook-pot"><div class="cook-broth" id="cookBroth"></div></div><div class="cook-flame">🔥🔥</div><div class="cook-dish" id="cookDish"></div></div>
+<div class="cook-step" id="cookStep">第一步 · 准备食材</div><div class="cook-ingredients" id="cookIngredients"></div>
+<div class="cook-progress" id="cookProgress" role="progressbar" aria-label="做饭进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+<p class="cook-status" id="cookStatus" role="status" aria-live="polite"></p>
+<div class="cook-actions"><button class="vault-btn primary" id="cookAction">开火</button><button class="vault-btn" id="cookReset">重新做</button></div>
+<h3 class="cook-step">🍽️ 小家的菜单日记</h3><div class="cook-history" id="cookHistory"></div>
+<p class="vault-subtle">虚拟厨房小游戏，食材免费。游戏计时不代表真实烹饪时间；菜谱日记保存在本机。</p>
+</div></section>
 <section class="daily-layer" id="dailyLayer" role="dialog" aria-modal="true" aria-labelledby="dailyHeading"><div class="daily-card">
 <div class="daily-head"><div><small>OUR LITTLE EVERYDAY</small><h2 id="dailyHeading">小家的日常 ♡</h2></div><button class="vault-x" id="dailyClose" aria-label="关闭">×</button></div>
 <div class="daily-tabs"><button data-daily="dream" class="active">🌙 梦境</button><button data-daily="mail">💌 邮箱</button><button data-daily="pet">🐾 Mochi</button><button data-daily="decor">🪄 布置</button></div>
@@ -234,7 +261,7 @@ let locPos,locNor,locCol,locMVP,locWarm,locDim;
 if(gl){let program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,VS));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,FS));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));gl.useProgram(program);
 locPos=gl.getAttribLocation(program,'aPos');locNor=gl.getAttribLocation(program,'aNormal');locCol=gl.getAttribLocation(program,'aColor');locMVP=gl.getUniformLocation(program,'uMVP');locWarm=gl.getUniformLocation(program,'uWarm');locDim=gl.getUniformLocation(program,'uDim');
 gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.clearDepth(1);gl.disable(gl.CULL_FACE)}
-let geom=[];let state={day:false,lamp:true,projector:true};let geometryDirty=true,buffer=null,count=0;
+let geom=[];let state={day:false,lamp:true,projector:true};let kitchenCook={stage:'prep',recipe:'beef',ingredients:[]};if(kitchen)window.homeCookVisual=v=>{kitchenCook={stage:v.stage,recipe:v.recipe,ingredients:Array.isArray(v.ingredients)?v.ingredients.slice(0,6):[]};geometryDirty=true;request()};let geometryDirty=true,buffer=null,count=0;
 const STORE_KEY='blan-laurie-'+room+'-decor-v1';const ROOM_NOTE='blan-laurie-'+room+'-note';
 const CATALOG=[
  {kind:'plant',name:'奶油绿植',emoji:'🪴',hint:'让家呼吸'},
@@ -454,7 +481,10 @@ if(kitchen){
  rounded(-1.91,1.128,-2.93,1.32,.035,.78,.05,'#5c5754',3);
  for(let x of [-2.24,-1.58]){cylinder(x,1.153,-2.94,.235,.235,.018,'#a59a8f',20);cylinder(x,1.167,-2.94,.185,.185,.016,'#4b4846',20)}
  cylinder(-2.24,1.32,-2.94,.24,.21,.28,'#e4c2ad',20);cylinder(-2.24,1.47,-2.94,.255,.255,.045,'#fff2dd',20);
- ellipsoid(-2.24,1.51,-2.94,.235,.075,.235,'#f7e4d2',16,7);ellipsoid(-2.24,1.59,-2.94,.065,.04,.065,'#b28c72',12,6);
+ if(kitchenCook.stage==='prep'&&!kitchenCook.ingredients.length||kitchenCook.stage==='served'){ellipsoid(-2.24,1.51,-2.94,.235,.075,.235,'#f7e4d2',16,7);ellipsoid(-2.24,1.59,-2.94,.065,.04,.065,'#b28c72',12,6)}else{cylinder(-2.24,1.50,-2.94,.225,.225,.025,'#b98860',20);const colors={beef:'#a76c54',noodle:'#f1dbb0',tofu:'#dec19a',greens:'#83a36b',tomato:'#d57561',egg:'#f4d487',potato:'#e6c68b',rice:'#fff2dd',sweet:'#d5a367',water:'#cbb897'};kitchenCook.ingredients.forEach((id,i)=>{let a=i*2.4;ellipsoid(-2.24+Math.cos(a)*.13,1.53,-2.94+Math.sin(a)*.13,.075,.038,.065,colors[id]||'#e4c4a0',9,5)})}
+ if(kitchenCook.stage==='heating'){for(let i=0;i<6;i++){let a=i*Math.PI/3;ellipsoid(-2.24+Math.cos(a)*.19,1.19,-2.94+Math.sin(a)*.19,.038,.065,.038,'#ed985a',8,5)}}
+ if(kitchenCook.stage==='heating'||kitchenCook.stage==='ready'){for(let i=0;i<4;i++)ellipsoid(-2.24+(i-1.5)*.08,1.68+(i%2)*.12,-2.94,.035,.11,.035,'#e9ddd1',8,5)}
+
  for(let x of [-2.55,-1.93])rounded(x,1.38,-2.94,.22,.07,.12,.025,'#d1a58a',3);
  // Overhead hood, oven and side counter.
  rounded(-1.93,2.49,-3.27,1.50,.30,.52,.05,'#e8d8c9',3);box(-1.93,2.85,-3.42,.55,.47,.24,'#e8d8c9');box(-1.93,2.31,-3.22,1.27,.06,.37,state.lamp?'#f8e4b4':'#c6b09d');
@@ -480,7 +510,7 @@ if(kitchen){
  rounded(x,.55,.85,.70,.14,.78,.09,side<0?'#f1d6cb':'#f5e5d3',4);
  for(let z of [.57,1.13])box(x+side*.28,.85,z,.07,.58,.07,oak);
  rounded(x+side*.29,1.12,.85,.12,.33,.69,.045,cream,3);
- let px=.45+side*.58;cylinder(px,.99,.85,.27,.25,.033,white,22);cylinder(px,1.018,.85,.20,.20,.014,'#e3c8b4',22);
+ let px=.45+side*.58;cylinder(px,.99,.85,.27,.25,.033,white,22);cylinder(px,1.018,.85,.20,.20,.014,'#e3c8b4',22);if(kitchenCook.stage==='served'){cylinder(px,1.055,.85,.20,.16,.09,'#f9ede1',18);cylinder(px,1.105,.85,.17,.17,.012,kitchenCook.recipe==='tomato'?'#d58463':kitchenCook.recipe==='porridge'?'#e8ca9e':'#ba8b65',18);for(let j=0;j<6;j++){let a=j*2.4;ellipsoid(px+.12*Math.cos(a),1.13,.85+.12*Math.sin(a),.049,.026,.04,kitchenCook.recipe==='tomato'?(j%2?'#e5c36c':'#c96954'):kitchenCook.recipe==='porridge'?'#d7a360':['#9b634e','#e7cfa1','#7e9c69'][j%3],8,5)}}
  cylinder(px,1.11,.38,.105,.085,.21,side<0?rose:white,14);
  ellipsoid(px+side*.105,1.11,.38,.07,.075,.035,side<0?rose:white,10,6);
  box(px+side*.35,1.00,.85,.025,.026,.37,'#b19680');
@@ -630,7 +660,7 @@ if(geometryDirty)createScene();let bg=state.day?[.94,.89,.84]:[.865,.797,.768];i
 let pitch=.60,dist=16;let eye=[dist*Math.sin(yaw)*Math.cos(pitch)+.10,dist*Math.sin(pitch)+1.3,dist*Math.cos(yaw)*Math.cos(pitch)-.1];let focus=[.10,1.30,-.1],aspect=w/h;
 let vh=(w<650?11.6:9.12)/scale;let vw=vh*aspect;
 let m=mul(ortho(vw,vh,.1,80),lookAt(eye,focus));m[13]-=.025;
-cameraNow={eye,focus,vh,vw,m,w,h,yaw};updateMarker();
+cameraNow={eye,focus,vh,vw,m,w,h,yaw};updateMarker();if(kitchen){const spot=document.getElementById('cookHotspot'),p=projectPos(-2.24,1.82,-2.94);spot.hidden=editorOpen||!p||p.x<35||p.x>w-35||p.y<150||p.y>h-125;if(!spot.hidden){spot.style.left=p.x+'px';spot.style.top=p.y+'px'}}
 if(gl){gl.uniformMatrix4fv(locMVP,false,new Float32Array(m));gl.uniform1f(locWarm,state.lamp&&!state.day?1:0);gl.uniform1f(locDim,state.day?1:state.lamp?.95:.80);bindHomeBuffer(buffer);gl.drawArrays(gl.TRIANGLES,0,count);drawMochi(performance.now())}
 else {makePet(performance.now());const roomGeom=geom;geom=roomGeom.concat(petGeom);try{paintSoftware(m,w,h,bg)}finally{geom=roomGeom}}
 }
@@ -820,6 +850,7 @@ function roomCard(){
  let raw=[];try{const v=JSON.parse(localStorage.getItem(decorKey)||'[]');if(Array.isArray(v))raw=v.slice(0,40)}catch(_){}
  const furn=raw.map(i=>(labels[i.kind]||String(i.kind||'家具').slice(0,20)));
  let str=['# Blan & Laurie · 回家状态卡','',`小家网址：${location.origin}${location.pathname}${location.search}`,isKitchen?'房间：奶油风3D厨房（大窗、奶油橱柜、冰箱、灶台、小火锅、双人餐桌）':isLiving?'房间：奶油风3D客厅（奶白L型沙发、云朵地毯、投影、书架、玻璃门零食柜）':'房间：韩系奶油风 3D 卧室',`窗外：${mode}`,`灯光：${light}`,...(isLiving?[`投影：${el('projector')?.textContent||'未设置'}`]:[]),`新添家具：${furn.length} 件${furn.length?'（'+furn.join('、')+'）':''}`,'','这张卡由 Blan 从小家主动复制，仅代表复制时的状态，不是自动同步，也不代表 AI 已进入网页。'];
+ if(isKitchen&&window.homeKitchenMeals){const meals=window.homeKitchenMeals();if(meals.length)str.push('最近做过的菜：'+meals.slice(0,3).map(m=>m.name).join('、'));}
  if(profileCheck.checked||memoryCheck.checked){
   let memory;try{memory=JSON.parse(localStorage.getItem(memoryKey)||'null')}catch(_){}
   if(profileCheck.checked){str.push('','## 人物设定');if(memory?.profile){str.push(`称呼：${String(memory.profile.who||'Blan').slice(0,60)} / ${String(memory.profile.ai||'Laurie').slice(0,60)}`,String(memory.profile.style||'').slice(0,1600),String(memory.profile.home||'').slice(0,1600))}else str.push('尚无本地记忆箱资料');}
@@ -927,6 +958,44 @@ q('cloudLock').onclick=lock;
 q('cloudSend').onclick=async()=>{if(!access||busy)return;const subject=q('cloudSubject').value.trim()||'一封小信',message=q('cloudMessage').value.trim();if(!message){status('先写一点内容吧 ♡');return}const v=version;busy=true;controller=new AbortController();const timeout=setTimeout(()=>controller?.abort(),18000);ui();status('正在寄信…');let sent=false;try{const data=await call('POST',{subject,message},controller.signal);if(v!==version)return;if(!data.success)throw Error('send failed');sent=true;q('cloudSubject').value='';q('cloudMessage').value='';status('寄出成功 ♡')}catch(e){if(v===version)status(fail(e)+'；若请求超时，先收信核实是否已寄出，避免重复。')}finally{clearTimeout(timeout);if(v===version){busy=false;controller=null;ui();if(sent)load()}}};
 document.querySelectorAll('[data-daily="mail"]').forEach(b=>b.addEventListener('click',()=>{if(access)load()}));
 window.addEventListener('pagehide',lock);ui();
+})();
+</script>
+<script>
+(()=>{
+'use strict';
+if(new URLSearchParams(location.search).get('room')!=='kitchen')return;
+const q=id=>document.getElementById(id),key='blan-laurie-kitchen-meals-v1';
+const ingredients={beef:['🥩','牛肉片'],noodle:['🍜','粉丝 / 面条'],tofu:['🟨','腐竹'],greens:['🥬','青菜'],tomato:['🍅','番茄'],egg:['🥚','鸡蛋'],potato:['🥔','土豆'],rice:['🍚','大米'],sweet:['🍠','红薯'],water:['💧','清水 / 汤底']};
+const recipes={beef:{name:'牛肉粉丝锅',emoji:'🍲',items:['water','beef','noodle','tofu','greens'],finish:'牛肉粉丝锅出锅啦！'},tomato:{name:'番茄鸡蛋面',emoji:'🍜',items:['water','tomato','egg','noodle'],finish:'酸酸香香的番茄鸡蛋面！'},porridge:{name:'红薯米粥',emoji:'🥣',items:['water','rice','sweet'],finish:'软糯的红薯米粥煮好了！'}};
+let selected='beef',added=[],stage='prep',progress=0,stirs=0,timer=null,history=[];
+try{const raw=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(raw))history=raw.filter(x=>x&&recipes[x.recipe]&&typeof x.date==='string').slice(0,30)}catch(_){}
+const make=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text)e.textContent=text;return e};
+function stop(){if(timer!==null){clearInterval(timer);timer=null}}
+function reset(){stop();stage='prep';added=[];progress=0;stirs=0;render()}
+function pick(id){if(id===selected)return;if(stage!=='prep'&&stage!=='served')return;selected=id;reset()}
+function renderHistory(){const root=q('cookHistory');root.replaceChildren();if(!history.length){root.append(make('p','','还没有做过饭，来做第一顿吧。'));return}for(const m of history.slice(0,6)){const date=new Date(m.date);root.append(make('p','',recipes[m.recipe].emoji+' '+recipes[m.recipe].name+' · '+(isNaN(date.getTime())?'':date.toLocaleDateString())+' · 两人份'))}}
+function render(){
+ const recipe=recipes[selected],buttons=q('cookRecipes');buttons.replaceChildren();
+ for(const [id,item] of Object.entries(recipes)){const b=make('button','cook-choice'+(id===selected?' active':''));b.type='button';b.append(make('span','',item.emoji),document.createTextNode(item.name));b.disabled=stage==='heating'||stage==='ready';b.setAttribute('aria-pressed',String(id===selected));b.onclick=()=>pick(id);buttons.append(b)}
+ const list=q('cookIngredients');list.replaceChildren();for(const id of recipe.items){const [emoji,name]=ingredients[id],done=added.includes(id),b=make('button','cook-ingredient'+(done?' done':''));b.type='button';b.append(make('span','',emoji),document.createTextNode(name+(done?' ✓':'')));b.disabled=done||stage!=='prep';b.onclick=()=>{added.push(id);render()};list.append(b)}
+ q('cookBroth').textContent=added.filter(id=>id!=='water').map(id=>ingredients[id][0]).join('');q('cookVisual').className='cook-visual '+stage;q('cookDish').textContent=recipe.emoji+' '+recipe.emoji;
+ q('cookProgress').firstElementChild.style.width=progress+'%';q('cookProgress').setAttribute('aria-valuenow',String(progress));const a=q('cookAction');a.disabled=false;
+ if(stage==='prep'){q('cookStep').textContent='第一步 · 把食材放进锅里';q('cookStatus').textContent=added.length===recipe.items.length?'食材齐啦，准备开火！':'已放入 '+added.length+' / '+recipe.items.length+' 样食材，点选上面的食材。';a.textContent='🔥 开火';a.disabled=added.length!==recipe.items.length}
+ if(stage==='heating'){q('cookStep').textContent='第二步 · 煮一煮，搅一搅';q('cookStatus').textContent='咕嘟咕嘟… '+progress+'% · 搅拌 '+stirs+' 次';a.textContent='🥄 搅一搅'}
+ if(stage==='ready'){q('cookStep').textContent='第三步 · 出锅装盘';q('cookStatus').textContent=recipe.finish+' 可以端到双人餐桌啦。';a.textContent='🍽️ 盛两份'}
+ if(stage==='served'){q('cookStep').textContent='开饭啦 ♡';q('cookStatus').textContent='两人份已摆上餐桌，今天的大厨一百昏！';a.textContent='回到餐桌看看'}
+ window.homeCookVisual?.({stage,recipe:selected,ingredients:added});renderHistory();
+}
+function tick(n){progress=Math.min(100,progress+n);if(progress===100){stage='ready';stop()}render()}
+function serve(){stage='served';history.unshift({recipe:selected,date:new Date().toISOString()});history=history.slice(0,30);let saved=true;try{localStorage.setItem(key,JSON.stringify(history))}catch(_){saved=false}render();if(!saved)q('cookStatus').textContent+='（本机日记保存失败。）'}
+q('cookAction').onclick=()=>{if(stage==='prep'&&added.length===recipes[selected].items.length){stage='heating';progress=0;stirs=0;render();timer=setInterval(()=>tick(10),900)}else if(stage==='heating'){stirs++;tick(9)}else if(stage==='ready'){serve()}else if(stage==='served'){close()}};
+function open(){q('cookLayer').classList.add('open');q('cookClose').focus()}
+function close(){q('cookLayer').classList.remove('open');q('cookLaunch').focus()}
+q('cookLaunch').hidden=false;q('cookLaunch').onclick=open;q('cookHotspot').onclick=open;q('cookClose').onclick=close;q('cookReset').onclick=reset;
+q('cookLayer').addEventListener('click',e=>{if(e.target===q('cookLayer'))close()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&q('cookLayer').classList.contains('open'))close()});
+window.addEventListener('pagehide',stop);
+window.homeKitchenMeals=()=>history.slice().map(x=>({...x,name:recipes[x.recipe].name}));
+render();
 })();
 </script>
 </body></html>
